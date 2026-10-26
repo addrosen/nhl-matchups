@@ -1,0 +1,42 @@
+{
+ "date": "2026-10-25",
+ "teams": {
+  "CHI": {
+   "confirmed": true
+  },
+  "FLA": {
+   "goalie": "Akira Schmid",
+   "confirmed": true
+  },
+  "DAL": {
+   "confirmed": true
+  },
+  "NYI": {
+   "confirmed": true
+  },
+  "MTL": {
+   "goalie": "Jacob Fowler",
+   "confirmed": true
+  },
+  "WPG": {
+   "confirmed": true
+  },
+  "COL": {
+   "goalie": "Scott Wedgewood",
+   "confirmed": true
+  },
+  "NSH": {
+   "goalie": "Justus Annunen",
+   "confirmed": true
+  },
+  "VAN": {
+   "goalie": "Leevi Meriläinen",
+   "confirmed": true
+  },
+  "MIN": {
+   "goalie": "Calvin Pickard",
+   "confirmed": true
+  }
+ },
+ "updated_at": "2026-10-26T02:17:40.933Z"
+}
