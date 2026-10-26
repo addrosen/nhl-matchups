@@ -1,0 +1,1330 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>NHL Matchups</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: a press-box game sheet, sibling to the NBA and NFL boards.
+   Night picker on top, five tabbed sheets, every number a conditional-format cell.
+   Ice-gray neutrals with a rink-blue accent; the goal-light red marks locked games. */
+:root {
+  --bg: #EDF1F3;
+  --surface: #FFFFFF;
+  --ink: #131C22;
+  --ink-2: #46535C;
+  --ink-3: #76838C;
+  --line: #D5DCE0;
+  --line-strong: #A8B4BB;
+  --accent: #1C5A8A;
+  --accent-soft: #DCE8F2;
+  --lo: #F8696B;
+  --mid: #FFEB84;
+  --hi: #63BE7B;
+  --cell-ink: #14191A;
+  --bar: #C9DCEB;
+  --lock: #9E2A2B;
+  --hi-ink: #1E7A3E;
+  --lo-ink: #B4232A;
+  --scrim: rgb(10 14 18 / .42);
+  --shadow: rgb(0 0 0 / .18);
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1417; --surface: #182027; --ink: #E5ECF0; --ink-2: #AAB7BF; --ink-3: #7E8B93;
+    --line: #2A353D; --line-strong: #48555E; --accent: #7FB3DE; --accent-soft: #1E2E3B;
+    --lo: #DC5E61; --mid: #E4CD66; --hi: #58AE73; --cell-ink: #0F1413; --bar: #23394B;
+    --lock: #F08A7E; --hi-ink: #7BD394; --lo-ink: #F08A8C; --scrim: rgb(0 0 0 / .55); --shadow: rgb(0 0 0 / .5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1417; --surface: #182027; --ink: #E5ECF0; --ink-2: #AAB7BF; --ink-3: #7E8B93;
+  --line: #2A353D; --line-strong: #48555E; --accent: #7FB3DE; --accent-soft: #1E2E3B;
+  --lo: #DC5E61; --mid: #E4CD66; --hi: #58AE73; --cell-ink: #0F1413; --bar: #23394B;
+  --lock: #F08A7E; --hi-ink: #7BD394; --lo-ink: #F08A8C; --scrim: rgb(0 0 0 / .55); --shadow: rgb(0 0 0 / .5);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; display: flex; flex-direction: column; gap: 16px; }
+@media (min-width: 700px) { .wrap { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); } }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1 { font-size: 34px; font-weight: 700; letter-spacing: .01em; text-transform: uppercase; line-height: 1; }
+.sub { margin: 6px 0 0; color: var(--ink-2); max-width: 74ch; }
+.eyebrow { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+.mast { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 3px; overflow: hidden; flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 13px; padding: 4px 10px; background: var(--surface); color: var(--ink-2); border: 0; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.seg.mode button { font-family: var(--display); font-size: 16px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 6px 16px; }
+
+/* night picker */
+.picker { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); }
+.field select { font: inherit; font-size: 16px; font-weight: 500; color: var(--ink); background: var(--bg); border: 1px solid var(--line-strong); border-radius: 4px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+.stamp { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--ink-2); padding-bottom: 4px; }
+.lock { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--lock); }
+.lock svg { width: 13px; height: 13px; fill: currentColor; }
+.lock.preview { color: var(--accent); }
+.gms { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 320px; min-width: 0; }
+.gm { font: inherit; font-size: 13px; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 3px; padding: 5px 10px; cursor: pointer; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gm:hover { color: var(--ink); border-color: var(--ink-3); }
+.gm svg { width: 11px; height: 11px; fill: var(--lock); margin-right: 5px; vertical-align: -1px; }
+.gm[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.gm[aria-pressed="true"] svg { fill: var(--surface); }
+.gms-head { flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; font-size: 12.5px; color: var(--ink-3); }
+.gms-head b { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); }
+.gm { display: inline-flex; align-items: center; gap: 7px; }
+.gm .rk { font-family: var(--display); font-weight: 700; font-size: 13px; color: var(--ink-3); min-width: 1.4em; }
+.gm[aria-pressed="true"] .rk { color: var(--surface); opacity: .8; }
+.gm .tm { color: var(--ink-3); font-size: 12px; }
+.gm[aria-pressed="true"] .tm { color: var(--surface); opacity: .8; }
+.gm .gv { font-weight: 600; color: var(--cell-ink); border-radius: 3px; padding: 0 5px; font-size: 12.5px; }
+.gm .gl { font-size: 11.5px; color: var(--ink-3); }
+.gm[aria-pressed="true"] .gl { color: var(--surface); opacity: .85; }
+
+/* tabs + key */
+.bar { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tabs button { font-family: var(--display); font-size: 17px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); background: transparent; border: 1px solid transparent; border-bottom: 3px solid transparent; padding: 6px 12px; cursor: pointer; }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.key { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.scale { display: flex; align-items: center; gap: 8px; }
+.scale i { display: block; width: 120px; height: 12px; border-radius: 2px; background: linear-gradient(90deg, var(--lo), var(--mid), var(--hi)); }
+
+/* cards + tables */
+#view { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; min-width: 0; display: flex; flex-direction: column; }
+.card > header { padding: 12px 16px 8px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.card h3 { font-size: 21px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.cap { color: var(--ink-2); font-size: 13px; margin: 0; max-width: 86ch; }
+.card > .cap { padding: 0 16px 10px; }
+.scroll { overflow-x: auto; min-width: 0; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 7px; text-align: right; white-space: nowrap; }
+thead th { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-bottom: 1px solid var(--line-strong); vertical-align: bottom; background: var(--surface); }
+tbody td { border-bottom: 1px solid var(--line); }
+tbody tr:last-child td { border-bottom: 0; }
+th.l, td.l { text-align: left; }
+th.pl, td.pl { text-align: left; position: sticky; left: 0; background: var(--surface); z-index: 1; padding-left: 16px; }
+td.pl { font-weight: 600; }
+td.pl small { display: block; font-weight: 400; color: var(--ink-3); font-size: 12px; }
+td.rk { color: var(--ink-3); font-size: 12.5px; padding-left: 16px; text-align: left; width: 1%; }
+td.rk + td.pl { padding-left: 4px; }
+td.h { color: var(--cell-ink); font-weight: 500; box-shadow: inset 0 0 0 1px var(--surface); border-bottom-color: transparent; }
+td.mut, th.mut { color: var(--ink-3); }
+td.why { text-align: left; color: var(--ink-2); white-space: normal; min-width: 200px; max-width: 290px; font-size: 12.5px; line-height: 1.35; }
+td.share { background-image: linear-gradient(90deg, var(--bar) calc(var(--w) * 1%), transparent 0); font-weight: 600; }
+.gs { border-left: 2px solid var(--line-strong); }
+.g { display: inline-block; min-width: 30px; text-align: center; font-family: var(--display); font-weight: 700; font-size: 15px; padding: 1px 6px; border-radius: 3px; color: var(--cell-ink); }
+.flag { display: inline-block; margin-left: 6px; font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); border: 1px solid currentColor; border-radius: 2px; padding: 0 4px; vertical-align: 1px; }
+.hit { font-weight: 600; }
+th .sortb { font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; white-space: nowrap; }
+th .sortb:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+th[aria-sort] .sortb { color: var(--accent); }
+th[aria-sort="descending"] .sortb::after { content: " \25BC"; font-size: 9px; }
+th[aria-sort="ascending"] .sortb::after { content: " \25B2"; font-size: 9px; }
+@media (max-width: 520px) { td.pl { white-space: normal; min-width: 128px; max-width: 150px; } }
+.link { font: inherit; font-weight: 600; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+.link:hover { color: var(--accent); text-decoration-color: currentColor; }
+.tlink { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+.tlink:hover { color: var(--accent); text-decoration-color: currentColor; }
+.chip { display: inline-block; font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 1px 6px; border-radius: 2px; border: 1px solid currentColor; }
+.chip.ok { color: var(--hi-ink); }
+.chip.proj { color: var(--ink-3); }
+
+/* tiles + prose + empty */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 0; border-top: 1px solid var(--line); }
+.tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 16px 12px; border-right: 1px solid var(--line); min-width: 0; }
+.tile:last-child { border-right: 0; }
+.tile b { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.tile small { color: var(--ink-2); font-size: 12.5px; }
+.empty { display: flex; flex-direction: column; gap: 10px; padding: 6px 16px 18px; color: var(--ink-2); max-width: 78ch; }
+.empty b { color: var(--ink); font-weight: 600; }
+.empty ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+.prose { padding: 2px 16px 14px; max-width: 86ch; font-size: 14.5px; line-height: 1.6; }
+.prose p { margin: 0 0 10px; }
+.prose h4 { margin: 14px 0 6px; font-family: var(--display); font-size: 17px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.prose b { font-weight: 600; }
+.prose ul, .prose ol { margin: 0 0 10px; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.formula { font-family: var(--display); font-size: 18px; font-weight: 600; letter-spacing: .02em; background: var(--bg); border-left: 3px solid var(--accent); padding: 8px 12px; margin: 0 0 12px; }
+.notice { margin: 0; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); color: var(--ink-2); }
+.notebar { margin: 0 16px 10px; padding: 8px 12px; border-radius: 4px; background: var(--accent-soft); color: var(--ink); font-size: 13px; }
+
+/* side panel */
+.scrim { position: fixed; inset: 0; z-index: 30; background: var(--scrim); }
+.panel { position: fixed; z-index: 31; top: 0; right: 0; bottom: 0; width: min(560px, 100%); background: var(--bg); border-left: 1px solid var(--line-strong); box-shadow: -12px 0 32px var(--shadow); overflow-y: auto; overscroll-behavior: contain; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); padding-right: env(safe-area-inset-right, 0px); }
+@media (max-width: 600px) { .panel { padding-left: env(safe-area-inset-left, 0px); border-left: 0; } }
+.phead { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
+.phead h2 { font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1; }
+.phead .meta { color: var(--ink-2); margin-top: 4px; font-size: 13.5px; }
+.xbtn { font: inherit; font-size: 22px; line-height: 1; width: 36px; height: 36px; flex: none; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.xbtn:hover { color: var(--ink); }
+.pin { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+.big3 { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+@media (max-width: 520px) { .big3.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.big3 > div { display: flex; flex-direction: column; gap: 3px; padding: 10px 14px; background: var(--surface); min-width: 0; }
+.big3 b { font-family: var(--display); font-size: 32px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.big3 small { color: var(--ink-2); font-size: 12px; }
+.big3 .was { display: block; color: var(--ink-3); font-size: 12.5px; font-weight: 500; font-family: var(--body); line-height: 1.3; }
+.big3 .row { display: flex; gap: 8px; align-items: center; }
+.psec { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; min-width: 0; }
+.psec > h3 { font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; padding: 10px 14px 4px; }
+.psec > .cap { padding: 0 14px 8px; }
+.steps { display: flex; flex-direction: column; padding: 2px 14px 10px; font-variant-numeric: tabular-nums; }
+.step { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 6px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.step:last-child { border-bottom: 0; }
+.step span small { display: block; color: var(--ink-3); font-size: 12px; }
+.step b { font-weight: 600; text-align: right; min-width: 64px; }
+.step.tot { border-top: 2px solid var(--line-strong); border-bottom: 0; font-weight: 600; }
+.step.tot b { font-family: var(--display); font-size: 20px; }
+.up { color: var(--hi-ink); } .dn { color: var(--lo-ink); } .flat { color: var(--ink-3); }
+.prof { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr)); gap: 0; border-top: 1px solid var(--line); }
+.prof > div { display: flex; flex-direction: column; gap: 1px; padding: 8px 14px 10px; border-right: 1px solid var(--line); min-width: 0; }
+.prof > div:last-child { border-right: 0; }
+.prof b { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.prof small { color: var(--ink-3); font-size: 12px; }
+.ptab { padding: 0 0 6px; }
+.ptab th:first-child, .ptab td:first-child { padding-left: 14px; text-align: left; }
+.ptab td.l { text-align: left; }
+.ptab tr.cur td { background: var(--accent-soft); }
+.pempty { padding: 0 14px 12px; color: var(--ink-2); margin: 0; }
+.prow { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; padding: 6px 14px 12px; font-size: 13px; color: var(--ink-2); }
+.btn { font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
+.btn:hover { background: var(--accent-soft); }
+/* chance-mix rows: his share as a bar, the opponent's allowance as a heat cell */
+.mixt td.mbar { width: 40%; min-width: 64px; }
+.mixt td.l { white-space: normal; min-width: 112px; }
+.mixt .track { position: relative; height: 14px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+.mixt .fill { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 2px; }
+.mixt .tick { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); }
+.mixt td.sh { font-weight: 600; min-width: 46px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 0 14px 10px; font-size: 12px; color: var(--ink-3); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; background: var(--accent); margin-right: 5px; vertical-align: -1px; }
+.legend i.t { width: 2px; height: 12px; background: var(--ink); }
+.gsel { font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); background: var(--bg); border: 1px solid var(--line-strong); border-radius: 4px; padding: 5px 8px; max-width: 220px; }
+.gsel:disabled { color: var(--ink-2); background: transparent; border-color: var(--line); opacity: 1; }
+.gconf { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.gconf input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+.gconf input:disabled + span { color: var(--ink-3); }
+.chip.swap { color: var(--accent); }
+.gerr { margin: 0 16px 10px; color: var(--lo-ink); font-size: 13px; }
+.cmpsum { margin: 0 14px 8px; padding: 8px 10px; border-radius: 4px; color: var(--cell-ink); font-size: 13.5px; }
+.ptab tr.xrow td { background: color-mix(in srgb, var(--ink) 4%, var(--surface)); font-size: 12.5px; color: var(--ink-2); }
+.ptab tr.xrow td:first-child { padding-left: 24px; }
+.board-tag { display: inline-block; margin-left: 4px; font-family: var(--display); font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.psec .seg { margin: 0 14px 8px; align-self: flex-start; }
+@media (max-width: 520px) {
+  .ptab th, .ptab td { padding: 6px 4px; font-size: 12.5px; }
+  .ptab th:first-child, .ptab td:first-child { padding-left: 10px; }
+  .ptab .g { min-width: 26px; font-size: 13.5px; padding: 1px 4px; }
+  .ptab .hide-sm { display: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">NHL · 2026-27</span>
+    <div class="mast"><h1>Matchup Board</h1>
+      <span class="seg mode" id="mode" role="group" aria-label="Stat"><button type="button" data-stat="sog" aria-pressed="true">Shots</button><button type="button" data-stat="g" aria-pressed="false">Goals</button><button type="button" data-stat="pts" aria-pressed="false">Points</button><button type="button" data-stat="ast" aria-pressed="false">Assists</button></span></div>
+    <p class="sub" id="sub">Projected shots on goal for every skater on the slate, adjusted for the defense and goalie he faces.</p>
+  </header>
+
+  <section class="picker" aria-label="Choose the night">
+    <div class="field">
+      <label for="night">Night</label>
+      <select id="night"><option>Loading…</option></select>
+    </div>
+    <div class="stamp" id="stamp"></div>
+    <div class="gms" id="gms" role="group" aria-label="Filter by game"></div>
+  </section>
+
+  <div class="bar">
+    <div class="tabs" role="tablist" aria-label="Sheets">
+      <button role="tab" type="button" data-tab="board" aria-selected="true">Board</button>
+      <button role="tab" type="button" data-tab="results" aria-selected="false">Results</button>
+      <button role="tab" type="button" data-tab="defense" aria-selected="false">Defenses</button>
+      <button role="tab" type="button" data-tab="goalies" aria-selected="false">Goalies</button>
+      <button role="tab" type="button" data-tab="how" aria-selected="false">How it works</button>
+    </div>
+    <div class="key"><div class="scale"><span>Tougher matchup</span><i></i><span>Better matchup</span></div></div>
+  </div>
+
+  <main id="view"><p class="notice">Loading the board…</p></main>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="ptitle" hidden></aside>
+
+<!-- always load the latest data (no stale copy after a new run) -->
+<script>document.write('<script src="data/index.js?t=' + Date.now() + '"><\/script>');</script>
+<script>
+/* Local data adapter: stands in for the claude.ai database so this page runs from
+   files on your Mac. nhl_site.py writes data/index.js (nights) and data/<date>.js
+   (each night's rows and game history). Goalie swaps are saved in this browser. */
+(function () {
+  const IDX = window.__NHL_INDEX || { meta: {}, nights: [] };
+  const got = {}, wait = {};
+  window.__NHL_NIGHT = (id, d) => { got[id] = d; (wait[id] || []).forEach((w) => w[0](d)); delete wait[id]; };
+  function night(id) {
+    if (got[id]) return Promise.resolve(got[id]);
+    return new Promise((res, rej) => {
+      if (wait[id]) { wait[id].push([res, rej]); return; }
+      wait[id] = [[res, rej]];
+      const n = IDX.nights.find((x) => x.id === id) || {};
+      const s = document.createElement("script");
+      s.src = `data/${id}.js?v=${encodeURIComponent(n.generated_at || n.posted_at || "")}`;
+      s.onerror = () => { (wait[id] || []).forEach((w) => w[1](new Error("missing " + id))); delete wait[id]; };
+      document.head.appendChild(s);
+    });
+  }
+  const snap = (d) => ({ exists: d != null, data: () => d });
+  const qs = (pairs) => ({ docs: pairs.map(([id, d]) => ({ id, data: () => d })) });
+  const listeners = {};
+  // ----- Goalie swaps: saved to swaps/<date>.json in the GitHub repo so every device sees them.
+  // Reading works for anyone; saving needs the owner's GitHub token on that device.
+  const REPO = (IDX.meta && IDX.meta.repo) || (location.hostname.endsWith(".github.io")
+    ? `${location.hostname.split(".")[0]}/${location.pathname.split("/").filter(Boolean)[0] || ""}` : "");
+  const TOKEN_KEY = "nhl-gh-token";
+  const token = () => { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; } };
+  const shas = {};
+  const b64 = (str) => { const by = new TextEncoder().encode(str); let s = ""; by.forEach((c) => (s += String.fromCharCode(c))); return btoa(s); };
+  const unb64 = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, "")), (c) => c.charCodeAt(0)));
+  const api = (id) => `https://api.github.com/repos/${REPO}/contents/swaps/${id}.json`;
+  const hdrs = () => ({ Authorization: `Bearer ${token()}`, Accept: "application/vnd.github+json" });
+  function localSwap(id) { try { const v = localStorage.getItem(`nhl-swaps-${id}`); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  async function readSwap(id) {
+    if (!REPO) return localSwap(id);
+    try {
+      if (token()) {
+        const r = await fetch(api(id) + `?t=${Date.now()}`, { headers: hdrs(), cache: "no-store" });
+        if (r.status === 404) { delete shas[id]; return null; }
+        if (r.ok) { const j = await r.json(); shas[id] = j.sha; return JSON.parse(unb64(j.content)); }
+      }
+      const r = await fetch(`swaps/${id}.json?t=${Date.now()}`, { cache: "no-store" });
+      return r.ok ? await r.json() : null;
+    } catch (e) { return null; }
+  }
+  async function writeSwap(id, obj) {
+    if (!REPO) { localStorage.setItem(`nhl-swaps-${id}`, JSON.stringify(obj)); return; }
+    if (!token()) throw new Error("sign in on this device to change goalies");
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (!(id in shas)) await readSwap(id);
+      const body = { message: `Goalie swap ${id}`, content: b64(JSON.stringify(obj, null, 1)) };
+      if (shas[id]) body.sha = shas[id];
+      const r = await fetch(api(id), { method: "PUT", headers: { ...hdrs(), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (r.ok) { shas[id] = (await r.json()).content.sha; return; }
+      if (r.status === 401 || r.status === 403) throw new Error("GitHub token rejected; sign in again");
+      delete shas[id];   // someone else saved first: refresh and retry once
+    }
+    throw new Error("couldn't save to GitHub");
+  }
+  function source(path) {
+    if (path === "board/meta") return Promise.resolve(IDX.meta || {});
+    if (path.startsWith("swaps/")) return readSwap(path.slice(6));
+    if (path.startsWith("feat/")) return night(path.slice(5)).then((d) => ({ features: d.feat || {} }));
+    if (path.startsWith("hist/")) { const id = path.slice(5, 15), team = path.slice(16); return night(id).then((d) => (d.hist && d.hist[team] ? { lines: d.hist[team] } : null)); }
+    return Promise.resolve(null);
+  }
+  // Small sign-in control at the bottom of the page
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!REPO) return;
+    const p = document.createElement("p");
+    p.style.cssText = "text-align:center;font-size:12px;opacity:.7;margin:24px 16px 32px";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.style.cssText = "font:inherit;background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer";
+    if (token()) {
+      p.textContent = "Goalie changes on this device save to GitHub. ";
+      btn.textContent = "Sign out";
+      btn.onclick = () => { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} location.reload(); };
+    } else {
+      p.textContent = "Owner: ";
+      btn.textContent = "sign in to change goalies on this device";
+      btn.onclick = () => {
+        const v = (window.prompt("Paste your GitHub token (stays on this device only):") || "").trim();
+        if (v) { try { localStorage.setItem(TOKEN_KEY, v); } catch (e) {} location.reload(); }
+      };
+    }
+    p.appendChild(btn);
+    document.body.appendChild(p);
+  });
+  function doc(path) {
+    return {
+      get: () => source(path).then(snap),
+      onSnapshot(cb, err) {
+        const run = () => source(path).then((d) => cb(snap(d)), (e) => err && err(e));
+        (listeners[path] = listeners[path] || []).push(run); run();
+        return () => { listeners[path] = (listeners[path] || []).filter((f) => f !== run); };
+      },
+      async set(obj) {
+        if (!path.startsWith("swaps/")) throw new Error("read-only");
+        await writeSwap(path.slice(6), obj);
+        (listeners[path] || []).forEach((f) => f());
+      },
+    };
+  }
+  function rowsFor(id) { return night(id).then((d) => qs([[id, { date: id, rows: d.rows || [] }]])); }
+  function collection(name) {
+    if (name === "nights") return { onSnapshot(cb) { setTimeout(() => cb(qs(IDX.nights.map((n) => [n.id, n])))); return () => {}; } };
+    return {
+      where: (f, op, id) => ({
+        get: () => rowsFor(id),
+        onSnapshot(cb, err) { rowsFor(id).then(cb, (e) => err && err(e)); return () => {}; },
+      }),
+    };
+  }
+  const db = { doc, collection };
+  window.claude = { use: async (what) => (what === "db" ? db : what === "user" ? { canEdit: () => !REPO || !!token() } : null) };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  const LOCK_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5a3 3 0 0 1 6 0v2h1a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1zm1.5 0h3V5a1.5 1.5 0 0 0-3 0v2z"/></svg>';
+  const GRADE_T = { "A+": 1, "A": 0.85, "B": 0.68, "C": 0.5, "D": 0.3, "F": 0.08 };
+  const GRADES = ["A+", "A", "B", "C", "D", "F"];
+  const TEAMS = { ANA: "Anaheim Ducks", BOS: "Boston Bruins", BUF: "Buffalo Sabres", CGY: "Calgary Flames", CAR: "Carolina Hurricanes", CHI: "Chicago Blackhawks", COL: "Colorado Avalanche", CBJ: "Columbus Blue Jackets", DAL: "Dallas Stars", DET: "Detroit Red Wings", EDM: "Edmonton Oilers", FLA: "Florida Panthers", LAK: "Los Angeles Kings", MIN: "Minnesota Wild", MTL: "Montréal Canadiens", NSH: "Nashville Predators", NJD: "New Jersey Devils", NYI: "New York Islanders", NYR: "New York Rangers", OTT: "Ottawa Senators", PHI: "Philadelphia Flyers", PIT: "Pittsburgh Penguins", SJS: "San Jose Sharks", SEA: "Seattle Kraken", STL: "St. Louis Blues", TBL: "Tampa Bay Lightning", TOR: "Toronto Maple Leafs", UTA: "Utah Mammoth", VAN: "Vancouver Canucks", VGK: "Vegas Golden Knights", WSH: "Washington Capitals", WPG: "Winnipeg Jets" };
+
+  // Per-stat configuration. th = grade thresholds on the matchup boost (A+, A, B, C floor, D floor).
+  const STATS = {
+    sog: { label: "Shots", short: "SOG", noun: "shots on goal", proj: "sog_proj", base: "sog_base", act: "sog", scale: 0.10, th: [0.12, 0.09, 0.025, -0.025, -0.08], probs: [2, 3, 4], dg: 2 },
+    g: { label: "Goals", short: "G", noun: "goals", proj: "g_proj", base: "g_base", act: "g", scale: 0.20, th: [0.21, 0.115, -0.01, -0.08, -0.125], probs: [1, 2], dg: 2 },
+    pts: { label: "Points", short: "PTS", noun: "points", proj: "pts_proj", base: "pts_base", act: "pts", scale: 0.20, th: [0.22, 0.12, 0.0, -0.08, -0.125], probs: [1, 2], dg: 2 },
+    ast: { label: "Assists", short: "AST", noun: "assists", proj: "ast_proj", base: "ast_base", act: "a", scale: 0.20, th: [0.24, 0.12, 0.0, -0.085, -0.13], probs: [1, 2], dg: 2 },
+  };
+  const SUBS = {
+    sog: "Projected shots on goal for every skater on the slate, adjusted for how many shots the opponent allows and where he shoots from.",
+    g: "Projected goals for every skater, matching where his chances come from (danger zone, rush, rebound) against what the opponent allows, plus the power play and the goalie.",
+    pts: "Projected points for every skater: his projected goals plus his projected assists, each matched against the opponent's chances allowed, penalty kill and starting goalie.",
+    ast: "Projected assists for every skater, matched against the same 5-on-5, penalty-kill and goalie factors as points.",
+  };
+
+  const state = {
+    db: null, meta: null, nights: [], rowsBy: {}, rowsFor: null, rowsUnsub: null,
+    nightId: null, games: [], tab: "board", stat: "sog", show: "all", pos: "all", dscope: "slate",
+    sort: { sog: { key: "proj", dir: "desc" }, g: { key: "proj", dir: "desc" }, pts: { key: "proj", dir: "desc" }, ast: { key: "proj", dir: "desc" } },
+    dsort: { key: "match", dir: "desc" }, gsort: { key: "team", dir: "asc" },
+    status: "loading", panel: null, hist: {}, feat: {},
+    rawRows: {}, swaps: {}, swapsUnsub: null, canEdit: false, saving: {}, swapErr: null,
+  };
+  try { const s = localStorage.getItem("nhl-stat"); if (STATS[s]) state.stat = s; } catch (e) {}
+  try { const t = localStorage.getItem("nhl-tab"); if (["board", "results", "defense", "goalies", "how"].includes(t)) state.tab = t; } catch (e) {}
+  const save = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const num = (x) => x != null && !isNaN(x);
+  const f1 = (x) => (num(x) ? Number(x).toFixed(1) : "–");
+  const f2 = (x) => (num(x) ? Number(x).toFixed(2) : "–");
+  const pct = (x, d = 0) => (num(x) ? (x * 100).toFixed(d) + "%" : "–");
+  const sgn = (x, d = 0) => (num(x) ? (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(d) + "%" : "–");
+  const sgnN = (x) => (num(x) ? (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(2) : "–");
+  const ord = (n) => { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+
+  // Conditional-format color: t in [0,1], 0 = red, .5 = yellow, 1 = green.
+  function heat(t) {
+    t = Math.max(0, Math.min(1, t));
+    if (t >= 0.5) return `color-mix(in srgb, var(--hi) ${Math.round((t - 0.5) * 200)}%, var(--mid))`;
+    return `color-mix(in srgb, var(--mid) ${Math.round(t * 200)}%, var(--lo))`;
+  }
+  const edgeT = (b, scale) => 0.5 + Math.max(-1, Math.min(1, b / scale)) * 0.5;
+  const gradeChip = (g) => `<span class="g" style="background:${heat(GRADE_T[g] ?? 0.5)}">${esc(g)}</span>`;
+  // Each posted night carries the grading rules it was posted with (thresholds, factor cap),
+  // so later formula changes never rewrite a night's grades. Older nights fall back to the defaults.
+  const nightOf = (id) => state.nights.find((x) => x.id === id) || null;
+  const thFor = (n, k) => (n && n.model && n.model.th && n.model.th[k]) || STATS[k].th;
+  const capFor = (n) => (n && n.settings && n.settings.factor_cap) || [0.75, 1.35];
+  function gradeOf(b, th) { if (!num(b)) return "C"; return b >= th[0] ? "A+" : b >= th[1] ? "A" : b >= th[2] ? "B" : b > th[3] ? "C" : b > th[4] ? "D" : "F"; }
+  function pAtLeast(lam, k) { if (!num(lam) || lam <= 0) return 0; let s = 0, t = Math.exp(-lam); for (let i = 0; i < k; i++) { s += t; t *= lam / (i + 1); } return Math.max(0, 1 - s); }
+  function fmtDate(id) { const [y, m, d] = id.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }); }
+  function fmtTime(iso) { if (!iso) return ""; const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }); }
+  function fmtStamp(iso) { if (!iso) return ""; const d = new Date(iso); return isNaN(d) ? esc(iso) : d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+  const teamName = (t) => TEAMS[t] || t;
+  // "Connor McDavid" and the box score's "C. McDavid" both become "c mcdavid"
+  function nameKey(name, team) {
+    const n = String(name || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\./g, "").trim().split(/\s+/);
+    return n.length ? `${(n[0] || "")[0] || ""} ${n.slice(1).join(" ")}|${team || ""}` : "";
+  }
+
+  const ZONES = [["high", "High danger", "Slot and crease chances"], ["medium", "Medium danger", "Between the slot and the perimeter"], ["low", "Low danger", "Point shots and sharp angles"]];
+  const PLAYS = [["rush", "Rush", "Chances off the rush"], ["reb", "Rebound", "Second chances off a rebound"], ["set", "Settled", "Everything else: cycle, point shots, net-front"]];
+  const hasMix = (r) => num(r.high_share);
+  const hasPlays = (r) => num(r.reb_share);
+  // Defense records for the selected night, by team
+  function defBy(n) { const o = {}; ((n && n.defense) || []).forEach((d) => (o[d.team] = d)); return o; }
+  // Slate-average share for a zone or play type, by position group, for the comparison tick
+  const avgCache = {};
+  function slateAvg(n, rows, key, grp) {
+    const ck = `${n ? n.id : ""}|${key}|${grp}`;
+    if (ck in avgCache) return avgCache[ck];
+    const xs = rows.filter((r) => r.grp === grp && num(r[key]));
+    return (avgCache[ck] = xs.length ? xs.reduce((s, r) => s + r[key], 0) / xs.length : null);
+  }
+
+  // ---------- data ----------
+  async function start() {
+    let db = null;
+    try { db = await claude.use("db"); } catch (e) { db = null; }
+    if (!db) { state.status = "nodb"; render(); return; }
+    state.db = db;
+    claude.use("user").then((u) => (u ? u.canEdit() : false)).then((v) => { state.canEdit = !!v; render(); }).catch(() => {});
+    db.doc("board/meta").onSnapshot((s) => { state.meta = s.exists ? s.data() : null; render(); }, onErr);
+    db.collection("nights").onSnapshot((q) => {
+      state.nights = q.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.id < b.id ? 1 : -1));
+      if (!state.nightId || !state.nights.some((n) => n.id === state.nightId)) { state.nightId = state.nights.length ? state.nights[0].id : null; state.games = []; }
+      state.status = "ok";
+      render();
+    }, onErr);
+  }
+  function onErr(e) { state.status = "err"; state.err = e && (e.code || e.message); render(); }
+  function subRows() {
+    if (!state.db || !state.nightId || state.rowsFor === state.nightId) return;
+    if (state.rowsUnsub) state.rowsUnsub();
+    const id = state.nightId;
+    state.rowsFor = id;
+    state.rowsUnsub = state.db.collection("rows").where("date", "==", id).onSnapshot((q) => {
+      const rows = [];
+      q.docs.forEach((d) => (d.data().rows || []).forEach((r) => rows.push(r)));
+      state.rawRows[id] = rows;
+      recompute(id);
+    }, () => { state.rowsBy[id] = []; render(); });
+    if (state.swapsUnsub) state.swapsUnsub();
+    state.swapsUnsub = state.db.doc(`swaps/${id}`).onSnapshot((snap) => {
+      state.swaps[id] = snap.exists ? snap.data() : null;
+      recompute(id);
+    }, () => {});
+  }
+  // Rebuild a night's rows with any goalie swaps applied.
+  function recompute(id) {
+    const raw = state.rawRows[id];
+    if (!raw) return;
+    state.rowsBy[id] = enrich(applySwaps(raw, id), nightOf(id));
+    Object.keys(avgCache).forEach((k) => delete avgCache[k]);
+    render();
+    if (state.panel) renderPanel();
+  }
+  function applySwaps(raw, id) {
+    const sw = (state.swaps[id] && state.swaps[id].teams) || {};
+    const n = state.nights.find((x) => x.id === id) || {};
+    const opts = n.goalie_options || {};
+    const cap = capFor(n);
+    const cl = (x) => Math.max(cap[0], Math.min(cap[1], x));
+    return raw.map((r) => {
+      const want = sw[r.opp] && sw[r.opp].goalie;
+      if (!want || want === r.goalie || !num(r.g_def) || !num(r.ev_g)) return r;
+      const o = (opts[r.opp] || []).find((x) => x.goalie === want);
+      if (!o) return r;
+      const g = o.ratio, ev_f = cl(r.ev_def * g), pp_f = cl(r.pp_def * g), g_ev_f = cl(r.g_def * g);
+      const g_proj = r.ev_g * g_ev_f + r.pp_g * pp_f, ast_proj = r.ev_a * ev_f + r.pp_a * pp_f;
+      return { ...r, goalie: o.goalie, posted_goalie: r.goalie, swapped: true, g_f: g, ev_f, pp_f, g_ev_f, g_proj, ast_proj, pts_proj: g_proj + ast_proj };
+    });
+  }
+  // The starter as posted, before any swap
+  function postedStarter(n, team) {
+    const g = ((n && n.goalies) || []).find((x) => x.team === team);
+    if (g && g.goalie) return g.goalie;
+    const raw = (n && state.rawRows[n.id]) || [];
+    const r = raw.find((x) => x.opp === team);
+    return r ? r.goalie : null;
+  }
+  async function saveSwap(team, patch) {
+    const n = currentNight();
+    if (!n || !state.db || state.saving[team]) return;
+    const cur = (state.swaps[n.id] && state.swaps[n.id].teams) || {};
+    const next = { ...cur, [team]: { ...(cur[team] || {}), ...patch } };
+    const posted = postedStarter(n, team);
+    if (next[team].goalie === posted) delete next[team].goalie;
+    if (!next[team].goalie && !next[team].confirmed) delete next[team];
+    state.saving[team] = true; state.swapErr = null; render();
+    try { await state.db.doc(`swaps/${n.id}`).set({ date: n.id, teams: next, updated_at: new Date().toISOString() }); }
+    catch (e) { state.swapErr = `Couldn't save the ${team} goalie change (${(e && (e.code || e.message)) || "error"}). Reload and try again.`; }
+    state.saving[team] = false; render();
+  }
+
+  // Add matchup boosts, grades and ranks for every stat.
+  function enrich(src, n) {
+    // Database records arrive frozen, so work on copies.
+    const rows = src.map((r) => ({ ...r }));
+    rows.forEach((r) => {
+      if (num(r.g_ev_factor) && !num(r.g_ev_f)) r.g_ev_f = r.g_ev_factor;
+      r.b = {}; r.gr = {}; r.rk = {};
+      Object.entries(STATS).forEach(([k, c]) => {
+        const base = r[c.base], proj = r[c.proj];
+        r.b[k] = base > 0 && num(proj) ? proj / base - 1 : 0;
+        if (!num(proj)) r[c.proj] = null;
+        r.gr[k] = gradeOf(r.b[k], thFor(n, k));
+      });
+      r.grp = r.pos === "D" ? "D" : "F";
+    });
+    Object.entries(STATS).forEach(([k, c]) => {
+      rows.slice().sort((a, b) => (b[c.proj] ?? 0) - (a[c.proj] ?? 0)).forEach((r, i) => (r.rk[k] = i + 1));
+    });
+    return rows;
+  }
+  const currentNight = () => state.nights.find((n) => n.id === state.nightId) || null;
+  const nightRows = (n) => (n ? state.rowsBy[n.id] : null);
+  function gameStarted(n, g) { if (!n) return false; if (n.status === "locked" || n.status === "graded") return true; return !!(g && g.start_utc && Date.now() >= new Date(g.start_utc).getTime()); }
+
+  // Actual box-score line for a row: by player id, else by name + team.
+  const nameIdx = {};
+  function act(n, r) {
+    if (!n || !n.results) return null;
+    const byId = n.results[String(r.pid)];
+    if (byId) return byId;
+    if (!nameIdx[n.id]) { const ix = {}; Object.values(n.results).forEach((x) => (ix[nameKey(x.name, x.team)] = x)); nameIdx[n.id] = ix; }
+    return nameIdx[n.id][nameKey(r.player, r.team)] || null;
+  }
+
+  // Tonight's matchup factors for each defense, read off the rows of the skaters facing it.
+  function slateDefense(n, rows) {
+    const by = {};
+    (rows || []).forEach((r) => {
+      if (by[r.opp]) return;
+      by[r.opp] = { team: r.opp, faces: r.team, goalie: r.goalie, sog_f: r.sog_f, ev_f: r.ev_f, pp_f: r.pp_f, game: r.game };
+    });
+    const raw = {};
+    ((n && n.defense) || []).forEach((d) => (raw[d.team] = d));
+    return Object.values(by).map((d) => {
+      const x = raw[d.team] || {};
+      const ptsMatch = 0.75 * (d.ev_f - 1) + 0.25 * (d.pp_f - 1);
+      return { ...x, ...d, sogMatch: d.sog_f - 1, ptsMatch };
+    });
+  }
+
+  // ---------- render ----------
+  function render() {
+    subRows();
+    document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.stat === state.stat)));
+    $("#mode").hidden = state.tab === "goalies";
+    $("#sub").textContent = state.tab === "goalies"
+      ? "Tonight's starting goalies and how each one changes the scoring outlook for the skaters he faces."
+      : SUBS[state.stat] + " Each night keeps the formula it was posted with and gets graded against the box score.";
+    document.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === state.tab)));
+    renderPicker();
+    const v = $("#view");
+    if (state.status === "nodb") { v.innerHTML = `<p class="notice">No board data found. Run <code>python3 nhl_matchup_board.py</code> in the nhl-model folder, then reload this page.</p>`; return; }
+    if (state.status === "err") { v.innerHTML = `<p class="notice">The board's data didn't load (${esc(state.err || "unavailable")}). Reload the page to try again.</p>`; return; }
+    if (state.status === "loading") { v.innerHTML = `<p class="notice">Loading the board…</p>`; return; }
+    if (state.tab === "board") v.innerHTML = boardHTML();
+    else if (state.tab === "results") v.innerHTML = resultsHTML();
+    else if (state.tab === "defense") v.innerHTML = defenseHTML();
+    else if (state.tab === "goalies") v.innerHTML = goaliesHTML();
+    else v.innerHTML = howHTML();
+  }
+
+  function renderPicker() {
+    const sel = $("#night");
+    const n = currentNight();
+    const html = state.nights.map((x) => `<option value="${esc(x.id)}"${x.id === state.nightId ? " selected" : ""}>${esc(fmtDate(x.id))}${x.status === "preview" ? " (preview)" : ""}</option>`).join("") || `<option value="">No nights yet</option>`;
+    if (sel.innerHTML !== html) sel.innerHTML = html;
+    sel.disabled = !state.nights.length;
+    const stamp = $("#stamp");
+    if (!n) stamp.innerHTML = `<span>No board posted yet</span>`;
+    else {
+      const games = n.games || [];
+      const started = games.filter((g) => gameStarted(n, g)).length;
+      const label = n.status === "graded" ? `<span class="lock">${LOCK_SVG}Graded</span>`
+        : n.status === "locked" || (games.length && started === games.length) ? `<span class="lock">${LOCK_SVG}All games started</span>`
+        : started ? `<span class="lock">${LOCK_SVG}${started} of ${games.length} games started</span>`
+        : `<span class="lock preview">Preview · no games started</span>`;
+      const rows = nightRows(n);
+      stamp.innerHTML = `${label}<span>${games.length} games · ${rows ? rows.length : "…"} skaters${n.posted_at ? ` · posted ${esc(fmtStamp(n.posted_at))}` : ""}</span>`;
+    }
+    const gms = $("#gms");
+    if (!n || state.tab !== "board") { gms.innerHTML = ""; return; }
+    const ranked = rankGames(n, state.stat);
+    const c = STATS[state.stat];
+    const head = ranked.some((g) => g.total != null)
+      ? `<div class="gms-head"><b>Games</b><span>Ranked by projected ${esc(c.noun)} for both teams' likely lineups (top 12 forwards and 6 defensemen by ice time). The % is how much the matchups lift that total above normal. Click to pick one or more games.</span></div>`
+      : `<div class="gms-head"><b>Games</b><span>Click to pick one or more games.</span></div>`;
+    const lifts = ranked.map((g) => g.lift).filter(num);
+    const lo = Math.min(...lifts), hi = Math.max(...lifts);
+    gms.innerHTML = head + [`<button type="button" class="gm" data-game="ALL" aria-pressed="${!state.games.length}">All games</button>`]
+      .concat(ranked.map((g, i) => {
+        const lk = gameStarted(n, g), t = fmtTime(g.start_utc), on = state.games.includes(g.game);
+        const tip = `${g.game}: ${g.total != null ? `${f1(g.total)} projected ${c.noun} (${sgn(g.lift)} vs normal). ` : ""}${lk ? "Started. Ratings stay on the formula they were posted with." : "Not started yet."}`;
+        const tt = num(g.lift) ? (hi > lo ? (g.lift - lo) / (hi - lo) : 0.5) : 0.5;
+        const val = g.total != null ? `<span class="gv" style="background:${heat(tt)}">${f1(g.total)} ${esc(c.short)}</span><span class="gl">${sgn(g.lift)}</span>` : "";
+        return `<button type="button" class="gm" data-game="${esc(g.game)}" aria-pressed="${on}" title="${esc(tip)}">${g.total != null ? `<span class="rk">${i + 1}</span>` : ""}${lk ? LOCK_SVG : ""}<span>${esc(g.game)}</span>${val}${t ? `<span class="tm">${esc(t)}</span>` : ""}</button>`;
+      })).join("");
+  }
+  // Games ordered by projected total of the stat (both teams), with how much the matchups lift it.
+  function rankGames(n, stat) {
+    const rows = nightRows(n), c = STATS[stat];
+    const games = (n.games || []).map((g) => ({ ...g, total: null, base: null, lift: null }));
+    if (!rows || (stat === "g" && !rows.some((r) => num(r.g_proj)))) return games;
+    // Likely lineup: each team's top 12 forwards and top 6 defensemen by ice time,
+    // so healthy scratches on the roster don't inflate a game's total.
+    const lineup = (rs) => {
+      const out = [];
+      [...new Set(rs.map((r) => r.team))].forEach((t) => {
+        const byToi = (grp, k) => rs.filter((r) => r.team === t && r.grp === grp && r.status !== "returning").sort((a, b) => (b.toi || 0) - (a.toi || 0)).slice(0, k);
+        out.push(...byToi("F", 12), ...byToi("D", 6));
+      });
+      return out;
+    };
+    games.forEach((g) => {
+      const rs = lineup(rows.filter((r) => r.game === g.game));
+      if (!rs.length) return;
+      g.total = rs.reduce((t, r) => t + (r[c.proj] || 0), 0);
+      g.base = rs.reduce((t, r) => t + (r[c.base] || 0), 0);
+      g.lift = g.base > 0 ? g.total / g.base - 1 : null;
+    });
+    return games.sort((a, b) => (b.total ?? -1) - (a.total ?? -1));
+  }
+
+  // ----- Board -----
+  function boardCols(stat) {
+    const c = STATS[stat];
+    const probs = c.probs.map((k) => ({ k: "p" + k, h: k + "+", t: `Model estimate of ${k} or more ${c.noun}`, v: (r) => pAtLeast(r[c.proj], k), fmt: (v) => pct(v), probe: true }));
+    const cols = [
+      { k: "proj", h: "Proj " + c.short, t: `Projected ${c.noun} tonight`, v: (r) => r[c.proj], gs: true },
+      { k: "base", h: "Normal", t: "His projection against a league-average opponent", v: (r) => r[c.base], mut: true },
+      { k: "boost", h: "Matchup", t: "How much tonight's opponent moves his projection", v: (r) => r.b[stat] },
+    ];
+    const rows = nightRows(currentNight()) || [];
+    const mixOn = rows.some(hasMix), playsOn = rows.some(hasPlays);
+    if (stat === "sog") {
+      cols.push({ k: "toi", h: "TOI", t: "Ice time per game (minutes)", v: (r) => r.toi, fmt: f1, mut: true });
+      if (mixOn) {
+        cols.push({ k: "sog_vol_f", h: "Volume", t: "Shots on goal the opponent allows per 60, vs league", v: (r) => num(r.sog_vol_f) ? r.sog_vol_f - 1 : null, fct: true });
+        cols.push({ k: "sog_zone_f", h: "Zones", t: "His shot mix by danger zone, weighted by the shots the opponent allows in each zone", v: (r) => num(r.sog_zone_f) ? r.sog_zone_f - 1 : null, fct: true });
+      }
+    } else if (stat === "g") {
+      if (mixOn) cols.push({ k: "zone_f", h: "Zones", t: "His chances by danger zone vs the chances this defense allows in each (before the goalie)", v: (r) => num(r.zone_f) ? r.zone_f - 1 : null, fct: true });
+      if (playsOn) cols.push({ k: "ctx_f", h: "Play type", t: "His rebound, settled and (when available) rush chances vs what this defense allows of each (before the goalie)", v: (r) => num(r.ctx_f) ? r.ctx_f - 1 : null, fct: true });
+      cols.push({ k: "g_ev_f", h: "5v5", t: "Full 5-on-5 goal factor: zones and play types, times the goalie", v: (r) => num(r.g_ev_f) ? r.g_ev_f - 1 : null, fct: true });
+      cols.push({ k: "pp_f", h: "PP", t: "Power-play factor: penalty-kill time and chances allowed, times the goalie", v: (r) => r.pp_f - 1, fct: true });
+      cols.push({ k: "hd", h: "HD share", t: "Share of his chances (by expected goals) that are high danger", v: (r) => r.high_share, fmt: (v) => pct(v), mut: true });
+    } else {
+      if (stat === "pts" && rows.some((r) => num(r.g_ev_f))) cols.push({ k: "g_ev_f", h: "5v5 G", t: "5-on-5 factor for his goals: zones and play types, times the goalie", v: (r) => num(r.g_ev_f) ? r.g_ev_f - 1 : null, fct: true });
+      cols.push({ k: "ev_f", h: stat === "pts" && rows.some((r) => num(r.g_ev_f)) ? "5v5 A" : "5v5", t: "5-on-5 factor: chances the defense allows, times the goalie", v: (r) => r.ev_f - 1, fct: true });
+      cols.push({ k: "pp_f", h: "PP", t: "Power-play factor: penalty-kill time and chances allowed, times the goalie", v: (r) => r.pp_f - 1, fct: true });
+      if (stat === "pts") cols.push({ k: "pp_share", h: "PP share", t: "Share of his normal points that come on the power play", v: (r) => r.pp_share, fmt: (v) => pct(v), mut: true });
+    }
+    probs[0].first = true;
+    return cols.concat(probs);
+  }
+  // The zone (or play type) that moves this player most tonight, in words.
+  function biggestEdge(r, list, oppD, suffix, shareOf) {
+    let best = null;
+    list.forEach(([k, label]) => {
+      const sh = shareOf(r, k), f = oppD[`${k}${suffix}`];
+      if (!num(sh) || !num(f)) return;
+      const c = sh * (f - 1);
+      if (!best || Math.abs(c) > Math.abs(best.c)) best = { k, label, sh, f, c };
+    });
+    return best && Math.abs(best.c) >= 0.015 ? best : null;
+  }
+  function whyText(r, stat) {
+    const parts = [];
+    if (r.status === "returning") parts.push("No games yet this season, so he may not dress");
+    const oppD = defBy(currentNight())[r.opp] || {};
+    if (stat === "sog") {
+      const d = r.sog_f - 1;
+      parts.push(Math.abs(d) < 0.02 ? `${r.opp} allows an average shot volume` : `${r.opp} allows ${sgn(d)} shots vs average`);
+      const e = hasMix(r) ? biggestEdge(r, ZONES, oppD, "_sa_60_f", (x, k) => x[`${k}_share`]) : null;
+      if (e) parts.push(`${pct(e.sh)} of his chances are ${e.label.toLowerCase()}, where ${r.opp} allows ${sgn(e.f - 1)}`);
+    } else if (stat === "g") {
+      const z = hasMix(r) ? biggestEdge(r, ZONES, oppD, "_xga_60_f", (x, k) => x[`${k}_share`]) : null;
+      const pl = hasPlays(r) ? biggestEdge(r, PLAYS.filter((x) => x[0] !== "set"), oppD, "_xga_60_f", (x, k) => x[`${k}_share`]) : null;
+      if (z) parts.push(`${pct(z.sh)} of his chances are ${z.label.toLowerCase()}; ${r.opp} allows ${sgn(z.f - 1)} there`);
+      if (pl) parts.push(`${pl.label} chances are ${pct(pl.sh)} of his game; ${r.opp} allows ${sgn(pl.f - 1)}`);
+      if (num(r.g_ev_f) && num(r.zone_f) && Math.abs(r.g_ev_f / (num(r.ctx_f) ? 0.5 * r.zone_f + 0.5 * r.ctx_f : r.zone_f) - 1) >= 0.05) {
+        const gf = r.g_ev_f / (num(r.ctx_f) ? 0.5 * r.zone_f + 0.5 * r.ctx_f : r.zone_f);
+        parts.push(`${esc(r.goalie || "The goalie")} allows ${sgn(gf - 1)} goals vs expected`);
+      }
+      if (r.g_pp_share >= 0.3 && Math.abs(r.pp_f - 1) >= 0.05) parts.push(`${pct(r.g_pp_share)} of his goals come on the PP vs a ${r.pp_f > 1 ? "soft" : "stingy"} kill`);
+      if (!parts.length) parts.push(hasMix(r) ? "Near-average matchup in every zone" : "Near-average matchup");
+      const games = (r.gp_cur || 0) + (r.gp_prior || 0);
+      if (games < 30 && num(r.g_raw) && Math.abs(r.g_raw - r.g_base) >= 0.05) parts.push(`Small sample: ${f2(r.g_raw)} goals/g pulled to ${f2(r.g_base)}`);
+      return parts.join(". ");
+    } else {
+      const ev = r.ev_f - 1, pp = r.pp_f - 1;
+      if (Math.abs(ev) >= 0.03) parts.push(`5v5 ${ev > 0 ? "boost" : "drag"} ${sgn(ev)} (chances allowed and ${esc(r.goalie || "goalie")})`);
+      if (r.pp_share >= 0.25 && Math.abs(pp) >= 0.05) parts.push(`PP-heavy (${pct(r.pp_share)}) vs a ${pp > 0 ? "soft" : "stingy"} penalty kill`);
+      else if (Math.abs(pp) >= 0.15) parts.push(`${pp > 0 ? "Soft" : "Stingy"} penalty kill ${sgn(pp)}`);
+      if (!parts.length) parts.push("Near-average matchup");
+    }
+    const games = (r.gp_cur || 0) + (r.gp_prior || 0);
+    if (stat !== "sog" && games < 30 && num(r.pts_raw) && Math.abs(r.pts_raw - r.pts_base) >= 0.08) parts.push(`Small sample: ${f2(r.pts_raw)} pts/g pulled to ${f2(r.pts_base)}`);
+    return parts.join(". ");
+  }
+  function boardHTML() {
+    const n = currentNight();
+    if (!n) return emptyBoard();
+    const all = nightRows(n);
+    if (!all) return `<section class="card"><header><h3>Loading skaters…</h3></header></section>`;
+    const stat = state.stat, c = STATS[stat], cols = boardCols(stat);
+    if (stat === "g" && !all.some((r) => num(r.g_proj))) return `<section class="card"><header><h3>Goals</h3></header><div class="empty"><p>This night was posted before goals were added to the model. Goal projections, danger zones and play types appear on every night posted from the updated script.</p></div></section>`;
+    let rows = all.slice();
+    if (state.games.length) rows = rows.filter((r) => state.games.includes(r.game));
+    if (state.pos !== "all") rows = rows.filter((r) => r.grp === state.pos);
+    if (state.show === "best") rows = rows.filter((r) => ["A+", "A", "B"].includes(r.gr[stat]));
+    const srt = state.sort[stat], dir = srt.dir === "asc" ? 1 : -1;
+    const col = cols.find((x) => x.k === srt.key);
+    rows.sort((a, b) => {
+      if (srt.key === "grade") return dir * ((GRADE_T[a.gr[stat]] ?? 0) - (GRADE_T[b.gr[stat]] ?? 0)) || b[c.proj] - a[c.proj];
+      if (srt.key === "player") return dir * String(a.player).localeCompare(String(b.player));
+      if (srt.key === "actual") return dir * (((act(n, a) || {})[c.act] ?? -1) - ((act(n, b) || {})[c.act] ?? -1));
+      const va = col ? col.v(a) : 0, vb = col ? col.v(b) : 0;
+      return dir * ((va ?? -9) - (vb ?? -9));
+    });
+    const graded = !!n.results;
+    const maxP = Math.max(0.01, ...all.map((r) => r[c.proj] || 0));
+    const th = (key, label, cls = "", title = "") => {
+      const s = srt.key === key ? ` aria-sort="${srt.dir === "asc" ? "ascending" : "descending"}"` : "";
+      return `<th class="${cls}"${s}${title ? ` title="${esc(title)}"` : ""}><button type="button" class="sortb" data-sort="${key}">${label}</button></th>`;
+    };
+    const head = `<tr><th class="mut" style="padding-left:16px;text-align:left">#</th>${th("player", "Player", "pl")}${th("grade", "Grade", "", "Matchup grade")}${cols.map((x) => th(x.k, x.h, x.gs || x.first ? "gs" : "", x.t)).join("")}${graded ? th("actual", "Actual", "gs", `Actual ${c.noun}`) : ""}<th class="l">Why</th></tr>`;
+    const body = rows.map((r) => {
+      const a = graded ? act(n, r) : null;
+      const loc = r.home === true ? "vs" : r.home === false ? "@" : "vs";
+      const small = r.status === "returning" ? `<span class="flag" title="Hasn't played yet this season (injury return, scratch or call-up). Projection leans on last season and his position; left out of the game rankings until he plays.">Returning</span>`
+        : (r.gp_cur || 0) + (r.gp_prior || 0) < 30 ? `<span class="flag" title="Fewer than 30 NHL games in the sample">Small sample</span>` : "";
+      const cells = cols.map((x) => {
+        const v = x.v(r), cls = (x.gs || x.first ? "gs " : "");
+        if (x.k === "proj") return `<td class="${cls}share" style="--w:${Math.round(((v || 0) / maxP) * 100)}">${f2(v)}</td>`;
+        if (x.k === "boost") return `<td class="h" style="background:${heat(edgeT(v, c.scale))}">${sgn(v)}</td>`;
+        if (x.fct) return num(v) ? `<td class="h" style="background:${heat(edgeT(v, 0.25))}">${sgn(v)}</td>` : `<td class="mut">–</td>`;
+        if (x.fmt) return `<td class="${cls}${x.mut ? "mut" : ""}">${x.fmt(v)}</td>`;
+        return `<td class="${cls}${x.mut ? "mut" : ""}">${f2(v)}</td>`;
+      }).join("");
+      const actual = graded ? (a ? `<td class="gs hit h" style="background:${heat(edgeT(a[c.act] - r[c.proj], stat === "sog" ? 2.5 : 1.5))}">${a[c.act]}</td>` : `<td class="gs mut" title="No box-score line">DNP</td>`) : "";
+      return `<tr><td class="rk">${r.rk[stat]}</td>
+        <td class="pl"><button type="button" class="link" data-player="${esc(r.pid)}">${esc(r.player)}</button>${small}<small>${esc(r.pos)} · <button type="button" class="tlink" data-team="${esc(r.team)}" data-side="off">${esc(r.team)}</button> ${loc} <button type="button" class="tlink" data-team="${esc(r.opp)}">${esc(r.opp)}</button> · ${esc(r.goalie || "?")}${r.swapped ? ` <span class="board-tag" title="Swapped in for ${esc(r.posted_goalie || "the projected starter")}">Swap</span>` : ""}</small></td>
+        <td>${gradeChip(r.gr[stat])}</td>${cells}${actual}<td class="why">${whyText(r, stat)}</td></tr>`;
+    }).join("");
+    const seg = (name, val, opts) => `<span class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-${name}="${v}" aria-pressed="${val === v}">${l}</button>`).join("")}</span>`;
+    return `${graded ? gradedSummary(n, all) : ""}<section class="card">
+      <header><h3>${esc(!state.games.length ? "Every skater" : state.games.length === 1 ? state.games[0] : `${state.games.length} games`)}</h3>
+        <div class="filters">${seg("pos", state.pos, [["all", "All"], ["F", "Forwards"], ["D", "Defense"]])}${seg("show", state.show, [["all", "All grades"], ["best", "B or better"]])}</div></header>
+      ${n.note ? `<p class="notebar">${esc(n.note)}</p>` : ""}
+      <p class="cap">Ranked by projected ${esc(c.noun)}. Click a player for his full breakdown, or a team for its defensive profile. <b>Matchup</b> is how far tonight's opponent moves him from his normal output, and the grade comes from that number alone. ${stat === "sog" ? "2+, 3+ and 4+" : "1+ and 2+"} are model estimates.${stat === "g" && all.some(hasMix) ? " <b>Zones</b> and <b>Play type</b> compare where his chances come from with what this defense allows; <b>5v5</b> blends the two and adds the goalie." : ""}</p>
+      <div class="scroll"><table><thead>${head}</thead><tbody>${body || `<tr><td class="l" colspan="14" style="padding:14px 16px">No skaters match this filter.</td></tr>`}</tbody></table></div>
+    </section>`;
+  }
+  function gradedSummary(n, rows) {
+    const c = STATS[state.stat];
+    const xs = rows.map((r) => ({ r, a: act(n, r) })).filter((x) => x.a);
+    if (!xs.length) return "";
+    const sum = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
+    const top = xs.slice().sort((x, y) => y.r[c.proj] - x.r[c.proj]).slice(0, 10);
+    const good = xs.filter((x) => ["A+", "A"].includes(x.r.gr[state.stat]));
+    const tile = (big, small) => `<div class="tile"><b>${big}</b><small>${small}</small></div>`;
+    return `<section class="card"><header><h3>How the night graded</h3></header><div class="tiles">
+      ${tile(`${sum(xs, (x) => x.a[c.act])} <span style="font-size:18px;color:var(--ink-3)">/ ${f1(sum(xs, (x) => x.r[c.proj]))}</span>`, `Actual vs projected ${esc(c.noun)}, skaters who played`)}
+      ${tile(f2(sum(top, (x) => x.a[c.act]) / top.length), `Per player by the top 10 projected (projected ${f2(sum(top, (x) => x.r[c.proj]) / top.length)})`)}
+      ${good.length ? tile(sgnN(sum(good, (x) => x.a[c.act] - x.r[c.base]) / good.length), `A and A+ matchups vs their normal output (${good.length} players)`) : ""}
+    </div></section>`;
+  }
+  function emptyBoard() {
+    return `<section class="card"><header><h3>No board yet</h3></header><div class="empty">
+      <p>Each night works the same way:</p>
+      <ol>
+        <li>Run <code>python3 nhl_matchup_board.py</code> on your Mac.</li>
+        <li>Reload this page. The script posts the night here by itself.</li>
+      </ol>
+      <p>The next morning, run <code>python3 nhl_matchup_board.py grade &lt;date&gt;</code> to grade the night, then reload.</p></div></section>`;
+  }
+
+  // ----- Results -----
+  function resultsHTML() {
+    const stat = state.stat, c = STATS[stat];
+    const graded = state.nights.filter((n) => n.results && state.rowsBy[n.id]);
+    const pendingIds = state.nights.filter((n) => n.results && !state.rowsBy[n.id]).map((n) => n.id);
+    pendingIds.forEach(loadRowsOnce);
+    if (!graded.length) {
+      return `<section class="card"><header><h3>Results</h3></header><div class="empty">
+        <p>${pendingIds.length ? "Loading graded nights…" : "Nothing graded yet. After a night's games are final, run the grade step and each skater's actual line fills in here."}</p>
+        <p>The key test is the table by grade: if the model works, A and A+ matchups beat their normal output and D and F matchups fall short, over enough nights.</p></div></section>`;
+    }
+    const all = [];
+    graded.forEach((n) => state.rowsBy[n.id].forEach((r) => { const a = act(n, r); if (a) all.push({ r, a, n }); }));
+    const by = {}; GRADES.forEach((g) => (by[g] = []));
+    all.forEach((x) => by[x.r.gr[stat]].push(x));
+    const avg = (arr, f) => (arr.length ? arr.reduce((s, x) => s + f(x), 0) / arr.length : NaN);
+    const gradeRows = GRADES.map((g) => {
+      const arr = by[g], diff = avg(arr, (x) => x.a[c.act] - x.r[c.base]);
+      return `<tr><td class="pl">${gradeChip(g)}</td><td>${arr.length}</td><td class="mut">${f2(avg(arr, (x) => x.r[c.base]))}</td><td>${f2(avg(arr, (x) => x.r[c.proj]))}</td><td class="gs">${f2(avg(arr, (x) => x.a[c.act]))}</td>
+        <td class="h" style="background:${arr.length ? heat(edgeT(diff, stat === "sog" ? 0.5 : 0.25)) : "transparent"}">${arr.length ? sgnN(diff) : "–"}</td></tr>`;
+    }).join("");
+    const nightRowsHTML = graded.map((n) => {
+      const xs = state.rowsBy[n.id].map((r) => ({ r, a: act(n, r) })).filter((x) => x.a);
+      const top = xs.slice().sort((x, y) => y.r[c.proj] - x.r[c.proj]).slice(0, 10);
+      const made = xs.reduce((s, x) => s + x.a[c.act], 0), proj = xs.reduce((s, x) => s + x.r[c.proj], 0);
+      return `<tr><td class="pl"><button type="button" class="sortb" data-open="${esc(n.id)}" style="color:var(--accent)">${esc(fmtDate(n.id))}</button></td><td>${(n.games || []).length}</td><td>${xs.length}</td>
+        <td class="gs">${f1(proj)}</td><td>${made}</td><td class="mut">${sgn(proj ? made / proj - 1 : NaN)}</td>
+        <td class="gs">${f2(avg(top, (x) => x.r[c.proj]))}</td><td>${f2(avg(top, (x) => x.a[c.act]))}</td></tr>`;
+    }).join("");
+    return `<section class="card"><header><h3>${esc(c.label)} by matchup grade</h3><span class="eyebrow">${all.length} player-games · ${graded.length} night${graded.length === 1 ? "" : "s"}</span></header>
+      <p class="cap"><b>Beat normal</b> is the actual ${esc(c.noun)} minus the player's normal projection. A working model shows it rising from F to A+. Expect noise until there are a few hundred player-games per grade.</p>
+      <div class="scroll"><table><thead><tr><th class="pl">Grade</th><th>Players</th><th>Normal</th><th>Projected</th><th class="gs">Actual</th><th>Beat normal</th></tr></thead><tbody>${gradeRows}</tbody></table></div></section>
+      <section class="card"><header><h3>Night by night</h3></header>
+      <div class="scroll"><table><thead><tr><th class="pl">Night</th><th>Games</th><th>Graded</th><th class="gs">Projected</th><th>Actual</th><th>Diff</th><th class="gs">Top 10 proj</th><th>Top 10 actual</th></tr></thead><tbody>${nightRowsHTML}</tbody></table></div></section>`;
+  }
+  const loading = {};
+  async function loadRowsOnce(id) {
+    if (!state.db || loading[id] || state.rowsBy[id]) return;
+    loading[id] = true;
+    try {
+      const q = await state.db.collection("rows").where("date", "==", id).get();
+      const rows = []; q.docs.forEach((d) => (d.data().rows || []).forEach((r) => rows.push(r)));
+      try { const sw = await state.db.doc(`swaps/${id}`).get(); state.swaps[id] = sw.exists ? sw.data() : null; } catch (e) {}
+      state.rawRows[id] = rows;
+      recompute(id);
+      return;
+    } catch (e) { state.rowsBy[id] = []; }
+    render();
+    if (state.panel) renderPanel();
+  }
+
+  // ----- Defenses -----
+  function defenseHTML() {
+    const n = currentNight();
+    const rows = nightRows(n);
+    if (!n || !rows) return `<section class="card"><header><h3>Defenses</h3></header><div class="empty"><p>${n ? "Loading…" : "Defense profiles appear once a night is posted."}</p></div></section>`;
+    const slate = slateDefense(n, rows);
+    const allRaw = (n.defense || []).filter((d) => d.sog_ag_60 != null);
+    const hasAll = allRaw.length > slate.length;
+    const scope = hasAll ? state.dscope : "slate";
+    let list;
+    if (scope === "all") {
+      const onSlate = {}; slate.forEach((d) => (onSlate[d.team] = d));
+      list = allRaw.map((d) => onSlate[d.team] || { ...d, sogMatch: d.sog_ag_60_f - 1, ptsMatch: 0.75 * (d.ev_xga_60_f - 1) + 0.25 * (d.pk_min_gp_f * d.pk_xga_60_f - 1), noGame: true });
+    } else list = slate;
+    const ptsMode = state.stat !== "sog";
+    const zoneCols = list.some((d) => num(d.high_xga_60_f)), playCols = list.some((d) => num(d.rush_xga_60_f));
+    const k = state.dsort.key, dir = state.dsort.dir === "asc" ? 1 : -1;
+    const getV = (d, key) => key === "match" ? (ptsMode ? d.ptsMatch : d.sogMatch) : key === "team" ? 0 : d[key];
+    list.sort((a, b) => k === "team" ? dir * teamName(a.team).localeCompare(teamName(b.team)) : dir * ((getV(a, k) ?? -9) - (getV(b, k) ?? -9)));
+    const ranked = list.slice().sort((a, b) => getV(b, "match") - getV(a, "match"));
+    const rankOf = {}; ranked.forEach((d, i) => (rankOf[d.team] = i + 1));
+    const hasRaw = list.some((d) => d.sog_ag_60 != null);
+    const th = (key, label, cls = "", title = "") => {
+      const s = state.dsort.key === key ? ` aria-sort="${state.dsort.dir === "asc" ? "ascending" : "descending"}"` : "";
+      return `<th class="${cls}"${s}${title ? ` title="${esc(title)}"` : ""}><button type="button" class="sortb" data-dsort="${key}">${label}</button></th>`;
+    };
+    const rawRange = (key) => { const vs = list.map((d) => d[key]).filter(num); return [Math.min(...vs), Math.max(...vs)]; };
+    const rawCell = (d, key, fmt, generousHigh = true) => {
+      if (!num(d[key])) return `<td class="mut">–</td>`;
+      const [lo, hi] = rawRange(key), t = hi > lo ? (d[key] - lo) / (hi - lo) : 0.5;
+      return `<td class="h" style="background:${heat(generousHigh ? t : 1 - t)}">${fmt(d[key])}</td>`;
+    };
+    const head = `<tr><th class="mut" style="padding-left:16px;text-align:left">#</th>${th("team", "Defense", "pl")}<th>Grade</th>${th("match", "Matchup", "gs", ptsMode ? "Blend of 5v5 and power-play factors for points" : "Shots on goal allowed vs average")}${th("sogMatch", "Shots", "", "Shots on goal allowed vs average")}${th("ev_f", "5v5", "", "5v5 chances allowed, times tonight's goalie")}${th("pp_f", "PP", "", "Penalty-kill time and chances allowed, times tonight's goalie")}<th class="l">Goalie</th>${zoneCols ? `${th("high_xga_60_f", "High danger", "gs", "High-danger expected goals allowed per 60 at 5v5, vs league")}${th("medium_xga_60_f", "Medium", "", "Medium-danger expected goals allowed per 60 at 5v5, vs league")}${th("low_xga_60_f", "Low", "", "Low-danger expected goals allowed per 60 at 5v5, vs league")}` : ""}${playCols ? `${th("rush_xga_60_f", "Rush", "gs", "Rush chances allowed (expected goals per 60 at 5v5), vs league")}${th("reb_xga_60_f", "Rebound", "", "Rebound chances allowed (expected goals per 60 at 5v5), vs league")}` : ""}${hasRaw ? `${th("sog_ag_60", "SOG/60", "gs", "Shots on goal allowed per 60 minutes")}${th("ev_xga_60", "5v5 xGA/60", "", "Expected goals allowed per 60 at 5-on-5")}${th("pk_min_gp", "PK min/g", "", "Minutes killing penalties per game")}${th("pk_xga_60", "PK xGA/60", "", "Expected goals allowed per 60 on the penalty kill")}` : ""}</tr>`;
+    const body = list.map((d) => {
+      const m = getV(d, "match"), grade = gradeOf(m, thFor(n, ptsMode ? "pts" : "sog"));
+      const f = (v) => num(v) ? `<td class="h" style="background:${heat(edgeT(v - 1, 0.25))}">${sgn(v - 1)}</td>` : `<td class="mut">–</td>`;
+      return `<tr><td class="rk">${rankOf[d.team]}</td><td class="pl"><button type="button" class="link" data-team="${esc(d.team)}">${esc(teamName(d.team))}</button><small>${d.noGame ? "Not on this slate" : `vs ${esc(d.faces)} tonight`}</small></td>
+        <td>${gradeChip(grade)}</td><td class="h gs" style="background:${heat(edgeT(m, ptsMode ? 0.2 : 0.1))}">${sgn(m)}</td>
+        <td class="h" style="background:${heat(edgeT(d.sogMatch, 0.1))}">${sgn(d.sogMatch)}</td>${d.noGame ? `<td class="mut">–</td><td class="mut">–</td><td class="l mut">–</td>` : `${f(d.ev_f)}${f(d.pp_f)}<td class="l">${esc(d.goalie || "?")}</td>`}
+        ${zoneCols ? `${f(d.high_xga_60_f).replace('<td class="', '<td class="gs ')}${f(d.medium_xga_60_f)}${f(d.low_xga_60_f)}` : ""}${playCols ? `${f(d.rush_xga_60_f).replace('<td class="', '<td class="gs ')}${f(d.reb_xga_60_f)}` : ""}
+        ${hasRaw ? `${rawCell(d, "sog_ag_60", f1).replace("<td class=\"", "<td class=\"gs ")}${rawCell(d, "ev_xga_60", f2)}${rawCell(d, "pk_min_gp", f1)}${rawCell(d, "pk_xga_60", f2)}` : ""}</tr>`;
+    }).join("");
+    const scopeSeg = hasAll ? `<span class="seg" role="group" aria-label="Which teams"><button type="button" data-dscope="slate" aria-pressed="${scope === "slate"}">Tonight</button><button type="button" data-dscope="all" aria-pressed="${scope === "all"}">All 32</button></span>` : "";
+    return `<section class="card"><header><h3>${scope === "all" ? "All 32 defenses" : "Tonight's defenses"}</h3>${scopeSeg}</header>
+      <p class="cap">How each defense treats the skaters it faces. Green helps the offense. ${ptsMode ? "For goals, points and assists, <b>Matchup</b> blends the 5v5 factor (75%) and the power-play factor (25%), about how a typical skater's points split." : "For shots, <b>Matchup</b> is shots on goal allowed per 60 minutes compared with the league."} The 5v5 and PP factors include tonight's starting goalie, so they change when the starter does.${zoneCols ? " The danger-zone and play-type columns are the defense alone, before the goalie." : ""}${hasRaw ? "" : " Raw rates (shots and expected goals allowed per 60) appear from the next posted night."}</p>
+      <div class="scroll"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>
+      ${state.meta && state.meta.credit ? `<p class="cap" style="padding:10px 16px 12px">${esc(state.meta.credit)}</p>` : ""}</section>`;
+  }
+
+  // ----- Goalies -----
+  function goaliesHTML() {
+    const n = currentNight();
+    const rows = nightRows(n);
+    if (!n || !rows) return `<section class="card"><header><h3>Goalies</h3></header><div class="empty"><p>${n ? "Loading…" : "Starting goalies appear once a night is posted."}</p></div></section>`;
+    const slate = slateDefense(n, rows);
+    const extra = {}; (n.goalies || []).forEach((g) => (extra[g.team] = g));
+    const sw = (state.swaps[n.id] && state.swaps[n.id].teams) || {};
+    const optsBy = n.goalie_options || {};
+    const canSwap = rows.some((r) => num(r.g_def)) && Object.keys(optsBy).length > 0;
+    let list = slate.map((d) => {
+      const x = extra[d.team] || {};
+      const cur = d.goalie, o = (optsBy[d.team] || []).find((y) => y.goalie === cur);
+      const st = o || (cur === x.goalie ? x : {});
+      const g = (n.games || []).find((y) => y.away === d.team || y.home === d.team);
+      return { team: d.team, faces: d.faces, goalie: cur, posted: postedStarter(n, d.team), swapped: !!(sw[d.team] && sw[d.team].goalie),
+        confirmed: !!x.confirmed || !!(sw[d.team] && sw[d.team].confirmed), ratio: st.ratio, gsax: st.gsax, gp_cur: st.gp_cur, gp_prior: st.gp_prior,
+        ev_f: d.ev_f, pp_f: d.pp_f, opts: optsBy[d.team] || [], locked: gameStarted(n, g) };
+    });
+    const hasStats = list.some((g) => num(g.ratio));
+    const k = state.gsort.key, dir = state.gsort.dir === "asc" ? 1 : -1;
+    const v = (g) => k === "ratio" ? (hasStats ? g.ratio : g.ev_f) : g[k];
+    list.sort((a, b) => k === "team" ? dir * a.team.localeCompare(b.team) : k === "goalie" ? dir * String(a.goalie).localeCompare(String(b.goalie)) : dir * ((v(a) ?? -99) - (v(b) ?? -99)));
+    const th = (key, label, cls = "", title = "") => {
+      const s = state.gsort.key === key ? ` aria-sort="${state.gsort.dir === "asc" ? "ascending" : "descending"}"` : "";
+      return `<th class="${cls}"${s}${title ? ` title="${esc(title)}"` : ""}><button type="button" class="sortb" data-gsort="${key}">${label}</button></th>`;
+    };
+    const head = `<tr>${th("team", "Team", "pl")}${th("goalie", "Goalie", "l")}<th class="l">Status</th>${hasStats ? `${th("ratio", "Goals vs expected", "gs", "Goals he allows per expected goal, pulled toward average. Above 0% = leakier than average, good for shooters")}${th("gsax", "GSAx", "", "Goals saved above expected, blended across seasons")}${th("gp_cur", "GP 26-27")}${th("gp_prior", "GP 25-26")}` : th("ratio", "5v5 factor", "gs", "5v5 factor for skaters facing him (defense and goalie combined)")}${th("pp_f", "PP factor", "", "Power-play factor for skaters facing him")}</tr>`;
+    const editable = (g) => canSwap && state.canEdit && !state.saving[g.team];
+    const body = list.map((g) => {
+      const optsHTML = (g.opts.length ? g.opts : [{ goalie: g.goalie }]).map((o) => `<option value="${esc(o.goalie)}"${o.goalie === g.goalie ? " selected" : ""}>${esc(o.goalie)}${o.goalie === g.posted && g.swapped ? " (projected)" : ""}${num(o.gsax) ? ` · ${o.gsax >= 0 ? "+" : "−"}${Math.abs(o.gsax).toFixed(1)} GSAx` : o.gp_cur === 0 && o.gp_prior === 0 && g.opts.length ? " · no NHL record" : ""}</option>`).join("");
+      const status = g.swapped ? `<span class="chip swap" title="Projected starter was ${esc(g.posted || "?")}">Swapped</span>` : g.confirmed ? `<span class="chip ok">Confirmed</span>` : `<span class="chip proj">Projected</span>`;
+      return `<tr>
+      <td class="pl"><button type="button" class="tlink" data-team="${esc(g.team)}">${esc(g.team)}</button><small>vs ${esc(g.faces)}${g.locked ? " · started" : ""}</small></td>
+      <td class="l"><select class="gsel" id="gsel-${esc(g.team)}" data-gswap="${esc(g.team)}" aria-label="${esc(g.team)} starting goalie"${editable(g) ? "" : " disabled"}>${optsHTML}</select></td>
+      <td class="l"><span style="display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap">${status}<label class="gconf"><input type="checkbox" id="gconf-${esc(g.team)}" data-gconf="${esc(g.team)}"${g.confirmed ? " checked" : ""}${editable(g) ? "" : " disabled"}><span>Confirmed</span></label>${g.swapped && editable(g) ? `<button type="button" class="tlink" data-greset="${esc(g.team)}" style="font-size:12.5px">Use projected</button>` : ""}</span></td>
+      ${hasStats ? `<td class="h gs" style="background:${heat(edgeT((g.ratio ?? 1) - 1, 0.25))}">${sgn((g.ratio ?? 1) - 1)}</td><td>${num(g.gsax) ? (g.gsax >= 0 ? "+" : "−") + Math.abs(g.gsax).toFixed(1) : "–"}</td><td>${g.gp_cur ?? "–"}</td><td class="mut">${g.gp_prior ?? "–"}</td>`
+        : `<td class="h gs" style="background:${heat(edgeT(g.ev_f - 1, 0.25))}">${sgn(g.ev_f - 1)}</td>`}
+      <td class="h" style="background:${heat(edgeT(g.pp_f - 1, 0.25))}">${sgn(g.pp_f - 1)}</td></tr>`; }).join("");
+    const projected = list.filter((g) => !g.confirmed && !g.swapped).length, swapped = list.filter((g) => g.swapped).length;
+    const how = !canSwap ? " Swapping goalies needs a night posted from the updated script."
+      : !state.canEdit ? " Only the board's owner can change starters."
+      : " Pick a different goalie to swap him in: goals, assists, points and grades update right away for every skater facing that team, and the change is saved. You can still correct a starter after puck drop; the night's grading rules stay as posted.";
+    return `<section class="card"><header><h3>Tonight's starters</h3><span class="eyebrow">${list.length - projected - swapped} confirmed · ${swapped ? `${swapped} swapped · ` : ""}${projected} projected</span></header>
+      <p class="cap">Green means a better night for the skaters he faces. <b>Projected</b> starters are the goalie with the most games played.${how}${hasStats ? "" : " Goalie-only numbers (goals vs expected, GSAx) appear from the next posted night; until then the factors shown combine defense and goalie."}</p>
+      ${state.swapErr ? `<p class="gerr">${esc(state.swapErr)}</p>` : ""}
+      <div class="scroll"><table><thead>${head}</thead><tbody>${body}</tbody></table></div></section>`;
+  }
+
+  // ----- How it works -----
+  function howHTML() {
+    const m = state.meta || {}, st = m.settings || {};
+    const rg = st.regress_games || {};
+    return `<section class="card"><header><h3>How the projection works</h3>${m.model_version ? `<span class="eyebrow">Model v${esc(m.model_version)}</span>` : ""}</header>
+      <div class="prose">
+        <p class="formula">Projected points = projected goals + projected assists</p>
+        <h4>His normal rates</h4>
+        <ul>
+          <li><b>Two seasons, blended.</b> Each skater's per-game shots, points and assists mix last season with this one. This season reaches half the weight after ${esc(st.blend_games ?? 15)} games.</li>
+          <li><b>Small samples pulled toward normal.</b> Every skater gets a few games of a typical player at his position and ice time mixed in (${esc(rg.sog_gp ?? 4)} games for shots, ${esc(rg.ev_pts_gp ?? 6)} for points and assists). A veteran barely moves; a rookie on a hot 5-game start gets pulled about halfway back.</li>
+          <li><b>Goals and assists split by situation.</b> 5-on-5 (and other even-strength) and power-play goals and assists are projected separately, because a defense can be good at one and bad at the other.</li>
+        </ul>
+        <h4>Tonight's opponent</h4>
+        <ul>
+          <li><b>Shots</b> scale half with the shots on goal the opponent allows per 60 minutes, and half with his own shots by danger zone weighted by the shots the opponent allows from each zone.</li>
+          <li><b>Goals at 5v5</b> use where his chances come from. <b>Danger zones</b> (high, medium, low, MoneyPuck's levels set by each shot's scoring chance) are hockey's version of scoring zones: a net-front scorer gets a boost against a defense that gives up the slot. <b>Play types</b> (rush, rebound, settled) work the same way: a rush threat gets a boost against a team that's loose in transition. The goal factor averages the two views, then multiplies by the goalie.</li>
+          <li><b>5v5 assist factor</b> = the opponent's 5-on-5 expected goals allowed per 60, times the starting goalie's goals allowed per expected goal.</li>
+          <li><b>PP factor</b> = how many minutes the opponent spends killing penalties, times its expected goals allowed on the kill, times the goalie.</li>
+          <li>Every factor is relative to league average (1.00) and capped between ${esc((st.factor_cap || [0.75, 1.35])[0])} and ${esc((st.factor_cap || [0.75, 1.35])[1])}.</li>
+          <li><b>The goalie</b> is regressed with ${esc(st.goalie_regress_xg ?? 20)} expected goals of average goaltending, so a hot week doesn't swing the board.</li>
+        </ul>
+        <h4>Grades and odds</h4>
+        <p>The grade comes from the matchup alone: how far tonight moves a player from his normal output. Grades are set by how matchups usually spread: over a season about 5% of matchups earn an A+, 10% an A, 20% a B, 30% a C, 20% a D and 15% an F. For shots, A+ means at least +12%; for goals about +21%, points +22% and assists +24%. Because the starting goalie usually pulls scoring projections down a little, a B for goals, points or assists can sit right around zero. Shots grades tend to move as a team, since the opponent&#39;s shots allowed drives most of the boost; the projection separates players within a team. Nights posted before Oct 30 keep the older cutoffs (A+ at +10% shots, +20% the rest). A low-volume player can earn an A, so read the grade next to the projection. The 1+, 2+ and higher columns treat the projection as a Poisson average, a reasonable estimate but a rough one for shots, which vary a bit more than that.</p>
+        <h4>Grades are frozen per night</h4>
+        <p>Each night is stored with the formula, grade cutoffs and factor cap it was posted with. When the model is recalibrated, only nights posted afterward use the new version, so the Results tab always grades the ratings that were on the board before the games. Factual corrections, like fixing the starting goalie after the fact, still apply.</p>
+        <h4>The nightly routine</h4>
+        <ol>
+          <li>Run <code>python3 nhl_matchup_board.py daily</code> (or let the scheduled job do it). It grades last night, builds tonight's board and updates this page.</li>
+          <li>Before puck drop, check confirmed starters and swap any that differ on the Goalies tab. Projections update instantly.</li>
+          <li>The next morning, run <code>python3 nhl_matchup_board.py grade &lt;date&gt;</code> if you need to grade a night by hand.</li>
+        </ol>
+        <p class="cap">Skater stats and schedules come from the NHL's public API. Team and goalie data: MoneyPuck.com.${m.data_as_of ? ` Data pulled ${esc(m.data_as_of)}.` : ""}</p>
+      </div></section>`;
+  }
+
+  // ---------- panels ----------
+  function openPanel(p) { state.panel = p; renderPanel(); $("#scrim").hidden = false; $("#panel").hidden = false; const x = $("#panel .xbtn"); if (x) x.focus(); }
+  function closePanel() { state.panel = null; $("#scrim").hidden = true; $("#panel").hidden = true; $("#panel").innerHTML = ""; }
+  function renderPanel() {
+    if (!state.panel) return;
+    const el = $("#panel"), top = el.scrollTop;
+    el.innerHTML = state.panel.kind === "player" ? playerPanel(state.panel.pid) : teamPanel(state.panel.team);
+    el.scrollTop = top;
+  }
+  function playerPanel(pid) {
+    const n = currentNight(), rows = nightRows(n) || [];
+    const r = rows.find((x) => String(x.pid) === String(pid));
+    const close = `<button type="button" class="xbtn" data-close aria-label="Close">×</button>`;
+    if (!r) return `<div class="phead"><div><h2 id="ptitle">Player</h2></div>${close}</div><div class="pin"><p class="pempty">This player isn't on the selected night.</p></div>`;
+    const stat = state.stat;
+    const loc = r.home === false ? "@" : "vs";
+    const tile = (k) => { const c = STATS[k]; return `<div><span class="row">${gradeChip(r.gr[k])}<small>${esc(c.label)}</small></span><b>${f2(r[c.proj])}<span class="was">normal ${f2(r[c.base])}</span></b><small>${sgn(r.b[k])} matchup · ${ord(r.rk[k])} on the slate</small></div>`; };
+    const step = (label, note, val, cls = "") => `<div class="step${cls ? " " + cls : ""}"><span>${label}${note ? `<small>${note}</small>` : ""}</span><b>${val}</b></div>`;
+    const fx = (f) => `<span class="${f > 1.005 ? "up" : f < 0.995 ? "dn" : "flat"}">× ${f2(f)}</span>`;
+    let steps;
+    const gOn = num(r.g_proj);
+    const gOnly = num(r.zone_f) ? (num(r.ctx_f) ? 0.5 * r.zone_f + 0.5 * r.ctx_f : r.zone_f) : null;
+    if (stat === "sog") {
+      steps = step("Normal shots on goal per game", "Two seasons blended, adjusted for sample size", f2(r.sog_base))
+        + (num(r.sog_zone_f)
+          ? step(`${esc(r.opp)} shot volume`, `Shots on goal ${esc(r.opp)} allows per 60, vs league (half the weight)`, fx(r.sog_vol_f))
+            + step("His shot zones", `His shots by danger zone, weighted by what ${esc(r.opp)} allows in each (half the weight)`, fx(r.sog_zone_f))
+            + step("Combined shot factor", "Average of the two", fx(r.sog_f))
+          : step(`${esc(r.opp)} shots allowed`, `Shots on goal ${esc(r.opp)} allows per 60, vs league`, fx(r.sog_f)))
+        + step("Projected shots on goal", "", f2(r.sog_proj), "tot");
+    } else if (stat === "g") {
+      if (!gOn) steps = step("Goals", "Not in this night's data. Nights posted from the updated script include goals.", "–");
+      else {
+        const ev = r.g_base * (1 - r.g_pp_share), pp = r.g_base * r.g_pp_share;
+        steps = step("Normal 5v5 goals per game", "Even-strength and shorthanded goals, adjusted for sample size", f2(ev))
+          + (num(r.zone_f) ? step("Danger zones", `His chances by zone vs what ${esc(r.opp)} allows in each`, fx(r.zone_f)) : "")
+          + (num(r.ctx_f) ? step("Play types", `His rush, rebound and settled chances vs ${esc(r.opp)}`, fx(r.ctx_f)) : "")
+          + (gOnly ? step(`${esc(r.goalie || "Goalie")}`, "Goals he allows per expected goal, regressed", fx(r.g_ev_f / gOnly)) : "")
+          + step("5v5 goal factor", gOnly ? (num(r.ctx_f) ? "Average of zones and play types, times the goalie" : "Zones times the goalie") : "Chances allowed times the goalie", fx(r.g_ev_f))
+          + step("Normal power-play goals per game", `${pct(r.g_pp_share)} of his normal goals`, f2(pp))
+          + step("Power-play matchup", `${esc(r.opp)}'s penalty-kill time and chances allowed, times the goalie`, fx(r.pp_f))
+          + step("Projected goals", `${f2(ev)} × ${f2(r.g_ev_f)} + ${f2(pp)} × ${f2(r.pp_f)}`, f2(r.g_proj), "tot");
+      }
+    } else if (stat === "pts" && gOn) {
+      steps = step("Projected goals", `5v5 × ${f2(r.g_ev_f)}, power play × ${f2(r.pp_f)} (see the Goals view)`, f2(r.g_proj))
+        + step("Projected assists", `5v5 × ${f2(r.ev_f)}, power play × ${f2(r.pp_f)} (see the Assists view)`, f2(r.ast_proj))
+        + step("Projected points", `Normal ${f2(r.pts_base)}: ${f2(r.g_base)} goals + ${f2(r.ast_base)} assists`, f2(r.pts_proj), "tot");
+    } else if (stat === "pts") {
+      const ev = r.pts_base * (1 - r.pp_share), pp = r.pts_base * r.pp_share;
+      steps = step("Normal 5v5 points per game", "Even-strength and shorthanded points", f2(ev))
+        + step("5v5 matchup", `Chances ${esc(r.opp)} allows at 5-on-5, times ${esc(r.goalie || "the goalie")}`, fx(r.ev_f))
+        + step("Normal power-play points per game", `${pct(r.pp_share)} of his normal points`, f2(pp))
+        + step("Power-play matchup", `${esc(r.opp)}'s penalty-kill time and chances allowed, times the goalie`, fx(r.pp_f))
+        + step("Projected points", `${f2(ev)} × ${f2(r.ev_f)} + ${f2(pp)} × ${f2(r.pp_f)}`, f2(r.pts_proj), "tot");
+    } else {
+      steps = step("Normal assists per game", "Two seasons blended, adjusted for sample size", f2(r.ast_base))
+        + step("Combined matchup", `5v5 (${sgn(r.ev_f - 1)}) and power-play (${sgn(r.pp_f - 1)}) factors, weighted by where his assists come from`, fx(r.ast_base > 0 ? r.ast_proj / r.ast_base : 1))
+        + step("Projected assists", "", f2(r.ast_proj), "tot");
+    }
+    const games = (r.gp_cur || 0) + (r.gp_prior || 0);
+    const pulled = num(r.pts_raw) ? r.pts_base - r.pts_raw : 0;
+    const sampleCap = Math.abs(pulled) >= 0.04
+      ? `With ${games} NHL games in the sample, his raw ${f2(r.pts_raw)} points per game was ${pulled < 0 ? "pulled down" : "pulled up"} to ${f2(r.pts_base)}, toward a typical ${r.grp === "D" ? "defenseman" : "forward"} at ${f1(r.toi)} minutes.`
+      : `With ${games} NHL games in the sample, his adjustment for sample size is small.`;
+    const oddsRows = Object.entries(STATS).filter(([k]) => k !== "g" || gOn).map(([k, c]) => `<tr${k === stat ? ' class="cur"' : ""}><td class="l">${esc(c.label)}</td><td><b>${f2(r[c.proj])}</b></td>${[1, 2, 3, 4].map((t) => `<td>${pct(pAtLeast(r[c.proj], t))}</td>`).join("")}</tr>`).join("");
+    const a = n && n.results ? act(n, r) : null;
+    const result = n && n.results ? `<section class="psec"><h3>Result</h3>${a ? `<div class="prof"><div><b>${a.sog}</b><small>Shots (proj ${f2(r.sog_proj)})</small></div>${gOn ? `<div><b>${a.g}</b><small>Goals (proj ${f2(r.g_proj)})</small></div>` : ""}<div><b>${a.pts}</b><small>Points (proj ${f2(r.pts_proj)})</small></div><div><b>${a.a}</b><small>Assists (proj ${f2(r.ast_proj)})</small></div><div><b>${esc(a.toi || "–")}</b><small>TOI</small></div></div>` : `<p class="pempty">No box-score line: he didn't play.</p>`}</section>` : "";
+    return `<div class="phead"><div><h2 id="ptitle">${esc(r.player)}</h2><div class="meta">${esc(r.pos)} · ${esc(teamName(r.team))} ${loc} ${esc(r.opp)} · facing ${esc(r.goalie || "?")}</div></div>${close}</div>
+      <div class="pin">
+        <div class="big3${gOn ? " n4" : ""}" style="--n:${gOn ? 4 : 3}">${tile("sog")}${gOn ? tile("g") : ""}${tile("pts")}${tile("ast")}</div>
+        <section class="psec"><h3>How tonight's ${esc(STATS[stat].noun)} projection is built</h3><div class="steps">${steps}</div></section>
+        ${mixSections(n, rows, r)}
+        ${historySections(n, r)}
+        <section class="psec"><h3>His sample</h3><p class="cap">${sampleCap}</p>
+          <div class="prof"><div><b>${f1(r.toi)}</b><small>TOI per game</small></div><div><b>${r.gp_cur ?? "–"}</b><small>Games 2026-27</small></div><div><b>${r.gp_prior ?? "–"}</b><small>Games 2025-26</small></div><div><b>${f2(r.pts_raw)}</b><small>Raw pts/g</small></div><div><b>${f2(r.pts_base)}</b><small>Adjusted pts/g</small></div><div><b>${pct(r.pp_share)}</b><small>Points on PP</small></div></div></section>
+        <section class="psec"><h3>Odds tonight</h3><p class="cap">Model estimates from treating each projection as a Poisson average.</p>
+          <div class="scroll ptab"><table><thead><tr><th class="l">Stat</th><th>Proj</th><th>1+</th><th>2+</th><th>3+</th><th>4+</th></tr></thead><tbody>${oddsRows}</tbody></table></div></section>
+        ${result}
+        <section class="psec"><h3>${esc(teamName(r.opp))}</h3><div class="prow"><span>Shots ${sgn(r.sog_f - 1)} · 5v5 ${sgn(r.ev_f - 1)} · PP ${sgn(r.pp_f - 1)} vs average</span><button type="button" class="btn" data-team="${esc(r.opp)}">Open defense</button></div></section>
+      </div>`;
+  }
+  // ----- game history (box scores, loaded when a panel opens) -----
+  const LI = { pid: 0, team: 1, opp: 2, date: 3, home: 4, toi: 5, sog: 6, g: 7, a: 8, pts: 9, b_sog: 10, b_g: 11, b_pts: 12, b_ast: 13, goalie: 14 };
+  const ACT_I = { sog: LI.sog, g: LI.g, pts: LI.pts, ast: LI.a };
+  const B_I = { sog: LI.b_sog, g: LI.b_g, pts: LI.b_pts, ast: LI.b_ast };
+  const FI = { name: 0, pos: 1, toi: 2, sog: 3, g: 4, pts: 5, ast: 6, pp_share: 7, high_share: 8, reb_share: 9 };
+  const BASE_I = { sog: FI.sog, g: FI.g, pts: FI.pts, ast: FI.ast };
+  function ensureHist(nid, team) {
+    state.hist[nid] = state.hist[nid] || {};
+    if (team in state.hist[nid] || !state.db) return;
+    state.hist[nid][team] = undefined;
+    state.db.doc(`hist/${nid}-${team}`).get().then((snap) => { state.hist[nid][team] = snap.exists ? (snap.data().lines || []) : null; if (state.panel) renderPanel(); },
+      () => { state.hist[nid][team] = null; if (state.panel) renderPanel(); });
+  }
+  function ensureFeat(nid) {
+    if (nid in state.feat || !state.db) return;
+    state.feat[nid] = undefined;
+    state.db.doc(`feat/${nid}`).get().then((snap) => { state.feat[nid] = snap.exists ? (snap.data().features || {}) : null; if (state.panel) renderPanel(); },
+      () => { state.feat[nid] = null; if (state.panel) renderPanel(); });
+  }
+  const dShort = (iso) => { if (!iso) return ""; const [y, m, d] = iso.split("-"); return `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][+m - 1]} ${+d} '${y.slice(2)}`; };
+  // The grade posted on the board that night, when the night exists and its rows are loaded
+  function postedGrade(pid, date, stat) {
+    const nn = state.nights.find((x) => x.id === date);
+    if (!nn) return null;
+    const rows = state.rowsBy[nn.id];
+    if (!rows) { loadRowsOnce(nn.id); return null; }
+    const row = rows.find((x) => String(x.pid) === String(pid));
+    return row ? row.gr[stat] : null;
+  }
+  function diffCell(actual, model, scale) {
+    const d = model > 0 ? actual / model - 1 : null;
+    return `<td class="h" style="background:${d == null ? "transparent" : heat(edgeT(d, scale))}">${d == null ? "–" : sgn(d)}</td>`;
+  }
+  function historySections(n, r) {
+    const stat = state.stat;
+    if (stat === "g" && !num(r.g_proj)) return "";
+    ensureHist(n.id, r.team); ensureHist(n.id, r.opp); ensureFeat(n.id);
+    const mine = state.hist[n.id][r.team], theirs = state.hist[n.id][r.opp], feats = state.feat[n.id];
+    const c = STATS[stat];
+    if (mine === undefined || feats === undefined) return `<section class="psec"><h3>His recent games</h3><p class="pempty">Loading game history…</p></section>`;
+    if (mine === null) return `<section class="psec"><h3>His recent games</h3><p class="pempty">Game history appears on nights posted from the updated script.</p></section>`;
+    const base = r[c.base];
+    const scale = stat === "sog" ? 0.5 : 1;
+    const games = mine.filter((l) => String(l[LI.pid]) === String(r.pid)).slice(0, 10);
+    let own;
+    if (!games.length) own = `<section class="psec"><h3>His recent games</h3><p class="pempty">No recent games on record.</p></section>`;
+    else {
+      const rowsH = games.map((l) => {
+        const b = l[B_I[stat]], posted = postedGrade(r.pid, l[LI.date], stat), grade = posted || gradeOf(b, thFor(n, stat));
+        const model = base * (1 + b), actual = l[ACT_I[stat]];
+        return `<tr><td>${esc(dShort(l[LI.date]))}</td><td class="l">${l[LI.home] ? "vs" : "@"} ${esc(l[LI.opp])}<small style="display:block;color:var(--ink-3);font-size:11.5px">${esc(l[LI.goalie] || "")}</small></td>
+          <td>${gradeChip(grade)}${posted ? `<span class="board-tag" title="Grade as posted on the board that night">Board</span>` : ""}</td><td class="mut">${f2(model)}</td><td><b>${actual}</b></td>${diffCell(actual, model, scale)}<td class="mut hide-sm">${f1(l[LI.toi])}</td></tr>`;
+      }).join("");
+      const good = games.filter((l) => ["A+", "A"].includes(gradeOf(l[B_I[stat]], thFor(n, stat)))), rest = games.filter((l) => !["A+", "A"].includes(gradeOf(l[B_I[stat]], thFor(n, stat))));
+      const avg = (arr, f) => arr.reduce((t, l) => t + f(l), 0) / arr.length;
+      const sumLine = good.length && rest.length
+        ? `<p class="cmpsum" style="background:${heat(edgeT(avg(good, (l) => l[ACT_I[stat]]) - avg(rest, (l) => l[ACT_I[stat]]), stat === "sog" ? 1 : 0.4))}">In his <b>${good.length}</b> A or A+ matchups he averaged <b>${f2(avg(good, (l) => l[ACT_I[stat]]))}</b> ${esc(c.noun)}, vs <b>${f2(avg(rest, (l) => l[ACT_I[stat]]))}</b> in his other ${rest.length}.</p>`
+        : `<p class="cmpsum" style="background:var(--bg)"><b>${f2(avg(games, (l) => l[ACT_I[stat]]))}</b> ${esc(c.noun)} a game over these ${games.length} games, against a model average of <b>${f2(avg(games, (l) => base * (1 + l[B_I[stat]])))}</b>.</p>`;
+      own = `<section class="psec"><h3>His recent games</h3>${sumLine}
+        <div class="scroll ptab"><table><thead><tr><th>Date</th><th class="l">Opponent</th><th>Grade</th><th title="His normal ${esc(c.noun)} times that game's matchup">Model</th><th>${esc(c.short)}</th><th title="Actual vs model">Diff</th><th class="hide-sm">TOI</th></tr></thead><tbody>${rowsH}</tbody></table></div>
+        <p class="cap" style="padding:6px 14px 10px">Newest first, this season plus the end of last season. Grades apply today's model to that opponent and the goalie he faced; games posted on the board show the grade as posted. Older games reflect each opponent's roster at the time.</p></section>`;
+    }
+    return own + compsSection(n, r, theirs, feats);
+  }
+  // Players most like him who faced tonight's opponent, and how their high-grade games went
+  const SIM_KEYS = { sog: ["toi", "sog", "high_share"], g: ["sog", "g", "high_share", "reb_share", "pp_share"], pts: ["toi", "pts", "g", "pp_share"], ast: ["toi", "ast", "pts", "pp_share"] };
+  function compsSection(n, r, theirs, feats) {
+    const stat = state.stat, c = STATS[stat];
+    const title = `<h3>Similar players vs ${esc(r.opp)}</h3>`;
+    if (theirs === undefined) return `<section class="psec">${title}<p class="pempty">Loading…</p></section>`;
+    if (!theirs || !feats) return "";
+    const me = feats[String(r.pid)] || [r.player, r.pos, r.toi, r.sog_base, r.g_base, r.pts_base, r.ast_base, r.pp_share, r.high_share, r.reb_share];
+    const grpOf = (pos) => (pos === "D" ? "D" : "F");
+    const keys = SIM_KEYS[stat].filter((k) => num(me[FI[k]]));
+    const pool = Object.values(feats).filter((f) => grpOf(f[FI.pos]) === grpOf(me[FI.pos]));
+    const sd = {}; keys.forEach((k) => { const vs = pool.map((f) => f[FI[k]]).filter(num); const m = vs.reduce((a, b) => a + b, 0) / (vs.length || 1); sd[k] = Math.sqrt(vs.reduce((a, b) => a + (b - m) ** 2, 0) / (vs.length || 1)) || 1; });
+    const simOf = (f) => { let d2 = 0, used = 0; keys.forEach((k) => { if (num(f[FI[k]])) { d2 += ((f[FI[k]] - me[FI[k]]) / sd[k]) ** 2; used++; } }); return used ? Math.exp(-d2 / (2 * used)) : 0; };
+    const MIN_SIM = 0.35;
+    const showAll = !!(state.panel && state.panel.compAll);
+    const byPid = {};
+    theirs.forEach((l) => {
+      if (l[LI.opp] !== r.opp || String(l[LI.pid]) === String(r.pid)) return;
+      const f = feats[String(l[LI.pid])];
+      if (!f || grpOf(f[FI.pos]) !== grpOf(me[FI.pos])) return;
+      (byPid[l[LI.pid]] = byPid[l[LI.pid]] || { f, games: [] }).games.push(l);
+    });
+    const tierOf = (set) => (l) => set.includes(gradeOf(l[B_I[stat]], thFor(n, stat)));
+    const build = (isHigh) => Object.entries(byPid).map(([pid, x]) => ({ pid, f: x.f, sim: simOf(x.f), games: x.games, hi: x.games.filter(isHigh) }))
+      .filter((x) => x.sim >= MIN_SIM && (showAll ? x.games.length : x.hi.length)).sort((a, b) => b.sim - a.sim).slice(0, 8);
+    let comps = build(tierOf(["A+", "A"])), fellBack = false;
+    if (!showAll && !comps.length) { comps = build(tierOf(["A+", "A", "B"])); fellBack = comps.length > 0; }
+    const seg = `<span class="seg" role="group" aria-label="Which games"><button type="button" data-compall="0" aria-pressed="${!showAll}">A or A+ grades</button><button type="button" data-compall="1" aria-pressed="${showAll}">All grades</button></span>`;
+    if (!comps.length) return `<section class="psec">${title}${seg}<p class="pempty">No ${grpOf(me[FI.pos]) === "D" ? "defensemen" : "forwards"} with a 35%+ profile match have ${showAll ? "faced" : "had a B-or-better matchup against"} ${esc(r.opp)} in the games on record.${showAll ? "" : " Try All grades."}</p></section>`;
+    const open = (state.panel && state.panel.compOpen) || {};
+    const used = [];
+    const rows = comps.map((x) => {
+      const gs = (showAll ? x.games : x.hi).slice().sort((a, b) => (a[LI.date] < b[LI.date] ? 1 : -1));
+      const base = x.f[BASE_I[stat]] || 0;
+      const act = gs.reduce((t, l) => t + l[ACT_I[stat]], 0) / gs.length, model = gs.reduce((t, l) => t + base * (1 + l[B_I[stat]]), 0) / gs.length;
+      gs.forEach((l) => used.push({ act: l[ACT_I[stat]], model: base * (1 + l[B_I[stat]]) }));
+      const isOpen = !!open[x.pid];
+      const head = `<tr${isOpen ? ' class="cur"' : ""}><td class="l"><button type="button" class="link" data-comp="${esc(x.pid)}" aria-expanded="${isOpen}">${esc(x.f[FI.name])}</button><small style="display:block;color:var(--ink-3);font-size:11.5px">${esc(gs[0][LI.team])} · ${gs.length} game${gs.length === 1 ? "" : "s"}</small></td>
+        <td>${Math.round(x.sim * 100)}%</td><td class="mut">${f2(model)}</td><td><b>${f2(act)}</b></td>${diffCell(act, model, stat === "sog" ? 0.5 : 1)}</tr>`;
+      const sub = isOpen ? gs.map((l) => `<tr class="xrow"><td class="l">${esc(dShort(l[LI.date]))} ${gradeChip(gradeOf(l[B_I[stat]], thFor(n, stat)))}<small style="display:block;color:var(--ink-3);font-size:11px">vs ${esc(l[LI.goalie] || "goalie unknown")}</small></td><td></td><td class="mut">${f2(base * (1 + l[B_I[stat]]))}</td><td><b>${l[ACT_I[stat]]}</b></td>${diffCell(l[ACT_I[stat]], base * (1 + l[B_I[stat]]), stat === "sog" ? 0.5 : 1)}</tr>`).join("") : "";
+      return head + sub;
+    }).join("");
+    const tA = used.reduce((t, u) => t + u.act, 0), tM = used.reduce((t, u) => t + u.model, 0);
+    const diff = tM > 0 ? tA / tM - 1 : null;
+    const tierWord = showAll ? "" : fellBack ? "B-or-better " : "A or A+ ";
+    const sum = diff == null ? "" : `<p class="cmpsum" style="background:${heat(edgeT(diff, 0.3))}">These players produced <b>${sgn(diff)}</b> vs the model across ${used.length} ${tierWord}game${used.length === 1 ? "" : "s"} against ${esc(r.opp)} (${f2(tA / used.length)} ${esc(c.noun)} a game vs ${f2(tM / used.length)} projected).</p>`;
+    const fallNote = fellBack ? `<p class="cap">No similar player had an A or A+ matchup against ${esc(r.opp)} in the games on record, so this shows B-or-better games.</p>` : "";
+    return `<section class="psec">${title}
+      <p class="cap">The ${grpOf(me[FI.pos]) === "D" ? "defensemen" : "forwards"} most like him by ${esc({ sog: "ice time, shot volume and shot location", g: "shot volume, scoring rate, chance location, rebounds and power-play role", pts: "ice time, scoring and power-play role", ast: "ice time, playmaking and power-play role" }[stat])}, and how they did against ${esc(r.opp)} when the model graded the matchup${showAll ? "" : " A or A+"}. Click a player for each game.</p>
+      ${seg}${fallNote}${sum}<div class="scroll ptab"><table><thead><tr><th class="l">Player</th><th title="How closely his profile matches">Match</th><th>Model</th><th>${esc(c.short)}</th><th title="Actual vs model">Diff</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="cap" style="padding:6px 14px 10px">Averages per game. Small samples: treat this as a cross-check on tonight's grade, not a forecast.</p></section>`;
+  }
+
+  // Where a player's chances come from, set against what tonight's opponent allows.
+  function mixTable(n, rows, r, list, suffix, oppD, title, cap) {
+    const lines = list.map(([k, label, note]) => {
+      const sh = r[`${k}_share`], avg = slateAvg(n, rows, `${k}_share`, r.grp), f = oppD[`${k}${suffix}`];
+      if (!num(sh)) return "";
+      return `<tr><td class="l">${label}<small style="display:block;color:var(--ink-3);font-size:11.5px">${note}</small></td>
+        <td class="mbar"><div class="track"><div class="fill" style="width:${Math.min(100, sh * 100)}%"></div>${num(avg) ? `<div class="tick" style="left:${Math.min(99, avg * 100)}%" title="Slate average ${pct(avg)}"></div>` : ""}</div></td>
+        <td class="sh">${pct(sh)}</td>${num(f) ? `<td class="h" style="background:${heat(edgeT(f - 1, 0.25))}">${sgn(f - 1)}</td>` : `<td class="mut">–</td>`}</tr>`;
+    }).join("");
+    if (!lines) return "";
+    return `<section class="psec"><h3>${title}</h3><p class="cap">${cap}</p>
+      <div class="scroll ptab"><table class="mixt"><thead><tr><th class="l">Type</th><th class="l">His share</th><th></th><th title="What ${esc(r.opp)} allows, vs league">${esc(r.opp)} allows</th></tr></thead><tbody>${lines}</tbody></table></div>
+      <div class="legend"><span><i></i>His share</span><span><i class="t"></i>Slate average for ${r.grp === "D" ? "defensemen" : "forwards"}</span></div></section>`;
+  }
+  function mixSections(n, rows, r) {
+    if (!hasMix(r) && !hasPlays(r)) return "";
+    const oppD = defBy(n)[r.opp] || {};
+    const stat = state.stat;
+    const zoneSuffix = stat === "sog" ? "_sa_60_f" : "_xga_60_f";
+    const zones = hasMix(r) ? mixTable(n, rows, r, ZONES, zoneSuffix, oppD, "Where his chances come from",
+      `Share of his chances by danger zone, measured by expected goals. ${stat === "sog" ? `The last column is how many unblocked shots ${esc(r.opp)} allows from each zone at 5-on-5.` : `The last column is how much ${esc(r.opp)} allows from each zone at 5-on-5, by expected goals.`} Zones are MoneyPuck's danger levels, set by each shot's scoring chance.`) : "";
+    const plays = hasPlays(r) ? mixTable(n, rows, r, PLAYS, "_xga_60_f", oppD, "How he scores",
+      `Share of his chances by play type, measured by expected goals, and how much ${esc(r.opp)} allows of each at 5-on-5. This is hockey's version of play types.`) : "";
+    return zones + plays;
+  }
+
+  function teamPanel(team) {
+    const n = currentNight(), rows = nightRows(n) || [];
+    const close = `<button type="button" class="xbtn" data-close aria-label="Close">×</button>`;
+    const slate = slateDefense(n, rows);
+    const d = slate.find((x) => x.team === team);
+    const raw = ((n && n.defense) || []).find((x) => x.team === team) || {};
+    if (!d) return `<div class="phead"><div><h2 id="ptitle">${esc(teamName(team))}</h2><div class="meta">Not on the selected night's slate</div></div>${close}</div><div class="pin"><p class="pempty">Pick a night where ${esc(team)} plays to see its matchup profile.</p></div>`;
+    const rankIn = (key) => 1 + slate.filter((x) => x[key] > d[key]).length;
+    const big = (lbl, b, th, scale, key) => `<div><span class="row">${gradeChip(gradeOf(b, th))}<small>${lbl}</small></span><b>${sgn(b)}</b><small>${ord(rankIn(key))} softest of ${slate.length} tonight</small></div>`;
+    const stat = state.stat, c = STATS[stat];
+    const facing = rows.filter((r) => r.opp === team).sort((a, b) => (b[c.proj] - b[c.base]) - (a[c.proj] - a[c.base])).slice(0, 10);
+    const facingRows = facing.map((r) => `<tr><td class="l"><button type="button" class="link" data-player="${esc(r.pid)}">${esc(r.player)}</button></td><td class="mut">${f2(r[c.base])}</td><td><b>${f2(r[c.proj])}</b></td><td class="h" style="background:${heat(edgeT(r.b[stat], c.scale))}">${sgn(r.b[stat])}</td></tr>`).join("");
+    const rawRows = raw.sog_ag_60 != null ? [
+      ["Shots on goal allowed per 60", f1(raw.sog_ag_60), raw.sog_ag_60_f],
+      ["5v5 expected goals allowed per 60", f2(raw.ev_xga_60), raw.ev_xga_60_f],
+      ["Penalty-kill minutes per game", f1(raw.pk_min_gp), raw.pk_min_gp_f],
+      ["PK expected goals allowed per 60", f2(raw.pk_xga_60), raw.pk_xga_60_f],
+    ].map(([l, v, f]) => `<tr><td class="l">${l}</td><td><b>${v}</b></td><td class="h" style="background:${heat(edgeT((f ?? 1) - 1, 0.25))}">${sgn((f ?? 1) - 1)}</td></tr>`).join("") : "";
+    const allDef = (n && n.defense) || [];
+    const rankAll = (key) => { const vs = allDef.map((x) => x[key]).filter(num); return 1 + vs.filter((v) => v > raw[key]).length; };
+    const chanceRows = (list, key) => list.map(([k, label]) => num(raw[`${k}${key}`]) ? `<tr><td class="l">${label}</td><td><b>${f2(raw[`${k}${key}`])}</b></td><td class="h" style="background:${heat(edgeT((raw[`${k}${key}_f`] ?? 1) - 1, 0.25))}">${sgn((raw[`${k}${key}_f`] ?? 1) - 1)}</td><td class="mut">${ord(rankAll(`${k}${key}`))}</td></tr>` : "").join("");
+    const zoneRows = chanceRows(ZONES, "_xga_60"), playRows = chanceRows(PLAYS, "_xga_60");
+    const chanceSec = zoneRows || playRows ? `<section class="psec"><h3>Chances allowed at 5v5</h3><p class="cap">Expected goals allowed per 60 minutes, by danger zone and by play type. Rank runs 1st (most generous) to ${allDef.length}th.</p>
+      <div class="scroll ptab"><table><thead><tr><th class="l">Chance type</th><th>xGA/60</th><th>vs league</th><th>Rank</th></tr></thead><tbody>${zoneRows}${playRows ? `<tr><td class="l" colspan="4" style="padding-top:10px;color:var(--ink-3);font-size:12px">By play type</td></tr>${playRows}` : ""}</tbody></table></div></section>` : "";
+    return `<div class="phead"><div><h2 id="ptitle">${esc(teamName(team))}</h2><div class="meta">Defense · tonight vs ${esc(d.faces)} · ${esc(d.goalie || "goalie unknown")} in net</div></div>${close}</div>
+      <div class="pin">
+        <div class="big3">${big("Shots", d.sogMatch, thFor(n, "sog"), 0.1, "sogMatch")}${big("5v5", d.ev_f - 1, thFor(n, "pts"), 0.2, "ev_f")}${big("Power play", d.pp_f - 1, thFor(n, "pts"), 0.2, "pp_f")}</div>
+        <p class="cap" style="margin:0">How much ${esc(team)} moves the skaters it faces tonight, compared with an average opponent. The 5v5 and power-play numbers include ${esc(d.goalie || "tonight's goalie")}.</p>
+        ${chanceSec}
+        ${rawRows ? `<section class="psec"><h3>Underlying rates</h3><div class="scroll ptab"><table><thead><tr><th class="l">Stat</th><th>${esc(team)}</th><th>vs league</th></tr></thead><tbody>${rawRows}</tbody></table></div><p class="cap" style="padding-top:6px">Defense only, before the goalie. Two seasons blended.</p></section>` : ""}
+        <section class="psec"><h3>${esc(d.faces)} skaters it helps most</h3><p class="cap">Biggest lift in projected ${esc(c.noun)} over each player's normal output. Switch the stat at the top of the page to change this list.</p>
+          ${facingRows ? `<div class="scroll ptab"><table><thead><tr><th class="l">Player</th><th>Normal</th><th>Tonight</th><th>Matchup</th></tr></thead><tbody>${facingRows}</tbody></table></div>` : `<p class="pempty">No skaters listed.</p>`}</section>
+      </div>`;
+  }
+
+  // ---------- events ----------
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("button, [data-close]");
+    if (!t) { if (e.target.id === "scrim") closePanel(); return; }
+    if (t.dataset.close !== undefined) { closePanel(); return; }
+    if (t.dataset.stat) { state.stat = t.dataset.stat; save("nhl-stat", state.stat); render(); if (state.panel) renderPanel(); return; }
+    if (t.dataset.tab) { state.tab = t.dataset.tab; save("nhl-tab", state.tab); render(); return; }
+    if (t.dataset.game) {
+      const g = t.dataset.game;
+      if (g === "ALL") state.games = [];
+      else state.games = state.games.includes(g) ? state.games.filter((x) => x !== g) : state.games.concat(g);
+      const n = currentNight();
+      if (n && state.games.length >= (n.games || []).length) state.games = [];   // every game picked = all games
+      render(); return;
+    }
+    if (t.dataset.pos) { state.pos = t.dataset.pos; render(); return; }
+    if (t.dataset.show) { state.show = t.dataset.show; render(); return; }
+    if (t.dataset.dscope) { state.dscope = t.dataset.dscope; render(); return; }
+    if (t.dataset.greset) { saveSwap(t.dataset.greset, { goalie: postedStarter(currentNight(), t.dataset.greset) }); return; }
+    const flip = (obj, key, defDir = "desc") => { if (obj.key === key) obj.dir = obj.dir === "desc" ? "asc" : "desc"; else { obj.key = key; obj.dir = key === "player" || key === "team" || key === "goalie" ? "asc" : defDir; } };
+    if (t.dataset.sort) { flip(state.sort[state.stat], t.dataset.sort); render(); return; }
+    if (t.dataset.dsort) { flip(state.dsort, t.dataset.dsort); render(); return; }
+    if (t.dataset.gsort) { flip(state.gsort, t.dataset.gsort); render(); return; }
+    if (t.dataset.open) { state.nightId = t.dataset.open; state.games = []; state.tab = "board"; save("nhl-tab", "board"); render(); return; }
+    if (t.dataset.comp && state.panel) { const o = state.panel.compOpen = state.panel.compOpen || {}; o[t.dataset.comp] = !o[t.dataset.comp]; renderPanel(); return; }
+    if (t.dataset.compall !== undefined && state.panel) { state.panel.compAll = t.dataset.compall === "1"; renderPanel(); return; }
+    if (t.dataset.player) { openPanel({ kind: "player", pid: t.dataset.player }); return; }
+    if (t.dataset.team) { openPanel({ kind: "team", team: t.dataset.team }); return; }
+  });
+  document.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset && t.dataset.gswap) saveSwap(t.dataset.gswap, { goalie: t.value });
+    else if (t.dataset && t.dataset.gconf) saveSwap(t.dataset.gconf, { confirmed: t.checked });
+  });
+  $("#scrim").addEventListener("click", closePanel);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && state.panel) closePanel(); });
+  $("#night").addEventListener("change", (e) => { state.nightId = e.target.value; state.games = []; if (state.panel) closePanel(); render(); });
+  // Re-check locks each minute so games flip to locked at puck drop.
+  setInterval(() => { if (state.status === "ok") renderPicker(); }, 60000);
+
+  render();
+  start();
+})();
+</script>
+
+</body></html>

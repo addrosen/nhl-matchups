@@ -1,0 +1,22 @@
+{
+ "date": "2026-10-26",
+ "teams": {
+  "NYR": {
+   "goalie": "James Reimer",
+   "confirmed": true
+  },
+  "CGY": {
+   "confirmed": true,
+   "goalie": "Devin Cooley"
+  },
+  "DET": {
+   "goalie": "Michal Postava",
+   "confirmed": true
+  },
+  "EDM": {
+   "goalie": "Tristan Jarry",
+   "confirmed": true
+  }
+ },
+ "updated_at": "2026-10-26T21:08:00.200Z"
+}
