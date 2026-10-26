@@ -1,0 +1,32 @@
+{
+ "date": "2026-11-07",
+ "teams": {
+  "FLA": {
+   "goalie": "Akira Schmid",
+   "confirmed": true
+  },
+  "WSH": {
+   "confirmed": true
+  },
+  "SEA": {
+   "goalie": "Joey Daccord"
+  },
+  "OTT": {
+   "goalie": "Samuel Ersson"
+  },
+  "MIN": {
+   "goalie": "Calvin Pickard",
+   "confirmed": true
+  },
+  "SJS": {
+   "goalie": "Alex Nedeljkovic"
+  },
+  "PIT": {
+   "goalie": "Sergei Murashov"
+  },
+  "DET": {
+   "goalie": "Daniil Tarasov"
+  }
+ },
+ "updated_at": "2026-11-07T15:45:42.922Z"
+}

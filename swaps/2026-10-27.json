@@ -1,0 +1,83 @@
+{
+ "date": "2026-10-27",
+ "teams": {
+  "CBJ": {
+   "goalie": "Cam Talbot",
+   "confirmed": true
+  },
+  "PHI": {
+   "goalie": "Dan Vladar",
+   "confirmed": true
+  },
+  "CHI": {
+   "confirmed": true
+  },
+  "LAK": {
+   "goalie": "Anton Forsberg",
+   "confirmed": true
+  },
+  "CAR": {
+   "confirmed": true
+  },
+  "FLA": {
+   "goalie": "Akira Schmid",
+   "confirmed": true
+  },
+  "WPG": {
+   "goalie": "Clay Stevenson",
+   "confirmed": true
+  },
+  "NYI": {
+   "goalie": "Semyon Varlamov",
+   "confirmed": true
+  },
+  "NSH": {
+   "confirmed": true
+  },
+  "NJD": {
+   "goalie": "Connor Hellebuyck",
+   "confirmed": true
+  },
+  "DAL": {
+   "goalie": "Casey DeSmith",
+   "confirmed": true
+  },
+  "MTL": {
+   "confirmed": true
+  },
+  "STL": {
+   "goalie": "Jordan Binnington",
+   "confirmed": true
+  },
+  "UTA": {
+   "confirmed": true
+  },
+  "MIN": {
+   "confirmed": true
+  },
+  "OTT": {
+   "goalie": "Jonas Johansson",
+   "confirmed": true
+  },
+  "VGK": {
+   "goalie": "Adin Hill",
+   "confirmed": true
+  },
+  "ANA": {
+   "confirmed": true
+  },
+  "BOS": {
+   "confirmed": true
+  },
+  "BUF": {
+   "goalie": "Colten Ellis"
+  },
+  "SJS": {
+   "confirmed": true
+  },
+  "VAN": {
+   "goalie": "Leevi Meriläinen"
+  }
+ },
+ "updated_at": "2026-10-27T23:56:48.480Z"
+}

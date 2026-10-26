@@ -1,0 +1,67 @@
+{
+ "date": "2026-11-05",
+ "teams": {
+  "NYR": {
+   "confirmed": true
+  },
+  "PHI": {
+   "goalie": "Joseph Woll",
+   "confirmed": true
+  },
+  "CHI": {
+   "goalie": "Arvid Soderblom"
+  },
+  "CAR": {
+   "goalie": "Brandon Bussi"
+  },
+  "NYI": {
+   "goalie": "Semyon Varlamov",
+   "confirmed": true
+  },
+  "DET": {
+   "goalie": "Daniil Tarasov"
+  },
+  "STL": {
+   "goalie": "Jordan Binnington",
+   "confirmed": true
+  },
+  "NJD": {
+   "goalie": "Connor Hellebuyck"
+  },
+  "PIT": {
+   "confirmed": true
+  },
+  "UTA": {
+   "goalie": "Sebastian Cossa"
+  },
+  "MTL": {
+   "goalie": "Jakub Dobes",
+   "confirmed": true
+  },
+  "DAL": {
+   "goalie": "Casey DeSmith",
+   "confirmed": true
+  },
+  "CBJ": {
+   "goalie": "Cam Talbot",
+   "confirmed": true
+  },
+  "VAN": {
+   "goalie": "Leevi Meriläinen"
+  },
+  "WPG": {
+   "confirmed": true
+  },
+  "EDM": {
+   "goalie": "Matt Tomkins",
+   "confirmed": true
+  },
+  "ANA": {
+   "goalie": "Laurent Brossoit"
+  },
+  "COL": {
+   "confirmed": true
+  }
+ },
+ "updated_at": "2026-11-05T21:18:48.553Z"
+}

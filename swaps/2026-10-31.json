@@ -1,0 +1,39 @@
+{
+ "date": "2026-10-31",
+ "teams": {
+  "CHI": {
+   "goalie": "Arvid Soderblom"
+  },
+  "BOS": {
+   "goalie": "Michael DiPietro",
+   "confirmed": true
+  },
+  "DET": {
+   "confirmed": true
+  },
+  "EDM": {
+   "goalie": "Tristan Jarry",
+   "confirmed": true
+  },
+  "NSH": {
+   "goalie": "Justus Annunen"
+  },
+  "OTT": {
+   "goalie": "Samuel Ersson"
+  },
+  "PIT": {
+   "goalie": "Sergei Murashov"
+  },
+  "MTL": {
+   "confirmed": true
+  },
+  "TOR": {
+   "goalie": "Anthony Stolarz",
+   "confirmed": true
+  },
+  "DAL": {
+   "confirmed": true
+  }
+ },
+ "updated_at": "2026-10-31T15:51:52.539Z"
+}

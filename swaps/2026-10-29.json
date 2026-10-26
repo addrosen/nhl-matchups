@@ -1,0 +1,79 @@
+{
+ "date": "2026-10-29",
+ "teams": {
+  "PIT": {
+   "confirmed": true
+  },
+  "CBJ": {
+   "confirmed": true
+  },
+  "TBL": {
+   "confirmed": true
+  },
+  "WPG": {
+   "confirmed": true
+  },
+  "DET": {
+   "confirmed": true
+  },
+  "WSH": {
+   "goalie": "Charlie Lindgren",
+   "confirmed": true
+  },
+  "NSH": {
+   "confirmed": true
+  },
+  "NYI": {
+   "confirmed": true
+  },
+  "MIN": {
+   "confirmed": true
+  },
+  "STL": {
+   "confirmed": true
+  },
+  "BOS": {
+   "confirmed": true
+  },
+  "DAL": {
+   "confirmed": true
+  },
+  "MTL": {
+   "goalie": "Jakub Dobes",
+   "confirmed": true
+  },
+  "LAK": {
+   "confirmed": true
+  },
+  "OTT": {
+   "goalie": "Jonas Johansson",
+   "confirmed": true
+  },
+  "BUF": {
+   "goalie": "Colten Ellis",
+   "confirmed": true
+  },
+  "ANA": {
+   "goalie": "Ville Husso",
+   "confirmed": true
+  },
+  "VAN": {
+   "goalie": "Leevi Meriläinen",
+   "confirmed": true
+  },
+  "SJS": {
+   "confirmed": true
+  },
+  "CAR": {
+   "confirmed": true
+  },
+  "CHI": {
+   "confirmed": true
+  },
+  "UTA": {
+   "goalie": "Sebastian Cossa",
+   "confirmed": true
+  }
+ },
+ "updated_at": "2026-10-30T16:02:29.694Z"
+}

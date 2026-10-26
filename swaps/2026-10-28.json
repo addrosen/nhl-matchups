@@ -1,0 +1,22 @@
+{
+ "date": "2026-10-28",
+ "teams": {
+  "CGY": {
+   "confirmed": true
+  },
+  "EDM": {
+   "goalie": "Tristan Jarry",
+   "confirmed": true
+  },
+  "COL": {
+   "confirmed": true
+  },
+  "NJD": {
+   "confirmed": true
+  },
+  "PHI": {
+   "goalie": "Joseph Woll"
+  }
+ },
+ "updated_at": "2026-10-28T19:33:34.553Z"
+}
