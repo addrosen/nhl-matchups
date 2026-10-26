@@ -1,0 +1,26 @@
+{
+ "date": "2026-10-30",
+ "teams": {
+  "FLA": {
+   "confirmed": true
+  },
+  "NJD": {
+   "goalie": "Connor Hellebuyck",
+   "confirmed": true
+  },
+  "VGK": {
+   "goalie": "Adin Hill"
+  },
+  "WPG": {
+   "goalie": "Nico Daws"
+  },
+  "CGY": {
+   "goalie": "Dustin Wolf",
+   "confirmed": true
+  },
+  "SEA": {
+   "goalie": "Joey Daccord"
+  }
+ },
+ "updated_at": "2026-10-30T21:14:48.365Z"
+}

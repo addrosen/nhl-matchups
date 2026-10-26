@@ -1,0 +1,28 @@
+{
+ "date": "2026-11-11",
+ "teams": {
+  "CGY": {
+   "goalie": "Devin Cooley",
+   "confirmed": true
+  },
+  "NYR": {
+   "goalie": "Joonas Korpisalo"
+  },
+  "EDM": {
+   "goalie": "Tristan Jarry"
+  },
+  "UTA": {
+   "goalie": "Sebastian Cossa"
+  },
+  "NSH": {
+   "goalie": "Justus Annunen"
+  },
+  "ANA": {
+   "goalie": "Laurent Brossoit"
+  },
+  "PIT": {
+   "goalie": "Sergei Murashov"
+  }
+ },
+ "updated_at": "2026-11-11T17:52:30.359Z"
+}

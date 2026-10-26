@@ -1,0 +1,28 @@
+{
+ "date": "2026-11-03",
+ "teams": {
+  "VGK": {
+   "goalie": "Adin Hill"
+  },
+  "PHI": {
+   "goalie": "Joseph Woll"
+  },
+  "WPG": {
+   "goalie": "Nico Daws"
+  },
+  "COL": {
+   "goalie": "Scott Wedgewood",
+   "confirmed": true
+  },
+  "UTA": {
+   "goalie": "Sebastian Cossa"
+  },
+  "TOR": {
+   "confirmed": true
+  },
+  "NJD": {
+   "goalie": "Connor Hellebuyck"
+  }
+ },
+ "updated_at": "2026-11-03T12:55:01.984Z"
+}

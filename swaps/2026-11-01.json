@@ -1,0 +1,36 @@
+{
+ "date": "2026-11-01",
+ "teams": {
+  "CAR": {
+   "confirmed": true
+  },
+  "WPG": {
+   "confirmed": true
+  },
+  "MIN": {
+   "confirmed": true
+  },
+  "WSH": {
+   "confirmed": true
+  },
+  "UTA": {
+   "confirmed": true
+  },
+  "PHI": {
+   "goalie": "Dan Vladar",
+   "confirmed": true
+  },
+  "NYR": {
+   "confirmed": true
+  },
+  "EDM": {
+   "goalie": "Matt Tomkins",
+   "confirmed": true
+  },
+  "OTT": {
+   "goalie": "Jonas Johansson",
+   "confirmed": true
+  }
+ },
+ "updated_at": "2026-11-02T01:08:43.563Z"
+}
