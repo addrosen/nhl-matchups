@@ -5,8 +5,9 @@
    "goalie": "Arvid Soderblom"
   },
   "BOS": {
-   "goalie": "Michael DiPietro"
+   "goalie": "Michael DiPietro",
+   "confirmed": true
   }
  },
- "updated_at": "2026-10-31T15:50:33.367Z"
+ "updated_at": "2026-10-31T15:50:35.752Z"
 }
