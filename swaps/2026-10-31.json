@@ -3,7 +3,10 @@
  "teams": {
   "CHI": {
    "goalie": "Arvid Soderblom"
+  },
+  "BOS": {
+   "goalie": "Michael DiPietro"
   }
  },
- "updated_at": "2026-10-31T15:50:27.068Z"
+ "updated_at": "2026-10-31T15:50:33.367Z"
 }
