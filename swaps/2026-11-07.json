@@ -15,8 +15,9 @@
    "goalie": "Samuel Ersson"
   },
   "MIN": {
-   "goalie": "Calvin Pickard"
+   "goalie": "Calvin Pickard",
+   "confirmed": true
   }
  },
- "updated_at": "2026-11-07T15:45:16.739Z"
+ "updated_at": "2026-11-07T15:45:19.792Z"
 }
